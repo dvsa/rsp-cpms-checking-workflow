@@ -17,7 +17,7 @@ functions:
       - sqs:
           arn:
             Fn::GetAtt:
-              - MyQueue
+              - CPMS_Launched_Payments
               - Arn
   check:
     handler: handler.check
