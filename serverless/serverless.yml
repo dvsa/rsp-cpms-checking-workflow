@@ -26,7 +26,7 @@ stepFunctions:
   stateMachines:
     yourStateMachine:
       definition:
-        Comment: "An example of the Amazon States Language using wait states"
+        Comment: "A state machine to check if launched CPMS payments have been successful"
         StartAt: FirstState
         States:
           FirstState:
@@ -62,4 +62,4 @@ resources:
     MyQueue:
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: "MyQueue"
+        QueueName: "CPMS_Launched_Payments"
