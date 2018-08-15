@@ -9,9 +9,11 @@ provider:
     - Effect: "Allow"
       Action: 
         - "sqs:ReceiveMessage"
+        - "sqs:DeleteMessage"
+        - "sqs:GetQueueAttributes"
       Resource:
         Fn::GetAtt:
-          - CPMS_Launched_Payments
+          - CPMSLaunchedPayments
           - Arn
 
 custom:
@@ -29,7 +31,7 @@ functions:
       - sqs:
           arn:
             Fn::GetAtt:
-              - CPMS_Launched_Payments
+              - CPMSLaunchedPayments
               - Arn
   check:
     handler: handler.check
@@ -75,7 +77,7 @@ plugins:
 
 resources:
   Resources:
-    MyQueue:
+    CPMSLaunchedPayments:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "CPMS_Launched_Payments"
