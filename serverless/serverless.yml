@@ -6,6 +6,10 @@ provider:
   stage: dev
   region: eu-west-1
 
+custom:
+  initialWait: 120
+  maxAttempts: 4
+
 # you can define service wide environment variables here
 #  environment:
 #    variable1: value1
@@ -24,7 +28,7 @@ functions:
 
 stepFunctions:
   stateMachines:
-    yourStateMachine:
+    cpmsCheckingStateMachine:
       definition:
         Comment: "A state machine to check if launched CPMS payments have been successful"
         StartAt: FirstState
@@ -32,7 +36,11 @@ stepFunctions:
           FirstState:
             Type: Task
             Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-start
-            Next: FinalState
+            Next: wait
+          wait:
+            Type: Wait
+            Seconds: ${self:custom.initialWait}
+            Next: CheckState
           CheckState:
             Type: Task
             Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-check
