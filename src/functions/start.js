@@ -6,6 +6,7 @@ export default (event, context, callback) => {
 	const stateMachineArn = process.env.statemachine_arn;
 	const params = {
 		stateMachineArn,
+		input: JSON.stringify(event),
 	};
 
 	return stepfunctions.startExecution(params).promise().then(() => {

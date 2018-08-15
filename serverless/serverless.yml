@@ -20,7 +20,7 @@ provider:
       Resource: "*"
 
 custom:
-  initialWait: 120
+  initialWait: 1
   maxAttempts: 4
 
 functions:
