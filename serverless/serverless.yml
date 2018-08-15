@@ -29,6 +29,8 @@ functions:
     events:
       - sqs:
           arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
+  environment:
+    statemachine_arn: ${self:resources.Outputs.cpmsCheckingStateMachine.Value}
   check:
     handler: handler.check
 
