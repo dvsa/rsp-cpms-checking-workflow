@@ -17,7 +17,7 @@ provider:
     - Effect: "Allow"
       Action:
         - "states:StartExecution"
-      Resource: ${self:resources.Outputs.cpmsCheckingStateMachine.Value}
+      Resource: "*"
 
 custom:
   initialWait: 120
