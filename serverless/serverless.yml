@@ -5,6 +5,8 @@ provider:
   runtime: nodejs6.10
   stage: dev
   region: eu-west-1
+  environment:
+    statemachine_arn: ${self:resources.Outputs.cpmsCheckingStateMachine.Value}
   iamRoleStatements:
     - Effect: "Allow"
       Action: 
@@ -12,14 +14,14 @@ provider:
         - "sqs:DeleteMessage"
         - "sqs:GetQueueAttributes"
       Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
+    - Effect: "Allow"
+      Action:
+        - "states:StartExecution"
+      Resource: ${self:resources.Outputs.cpmsCheckingStateMachine.Value}
 
 custom:
   initialWait: 120
   maxAttempts: 4
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
 
 functions:
   start:
@@ -35,12 +37,8 @@ stepFunctions:
     cpmsCheckingStateMachine:
       definition:
         Comment: "A state machine to check if launched CPMS payments have been successful"
-        StartAt: FirstState
+        StartAt: wait
         States:
-          FirstState:
-            Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-start
-            Next: wait
           wait:
             Type: Wait
             Seconds: ${self:custom.initialWait}
