@@ -11,10 +11,7 @@ provider:
         - "sqs:ReceiveMessage"
         - "sqs:DeleteMessage"
         - "sqs:GetQueueAttributes"
-      Resource:
-        Fn::GetAtt:
-          - CPMSLaunchedPayments
-          - Arn
+      Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
 
 custom:
   initialWait: 120
@@ -29,10 +26,7 @@ functions:
     handler: handler.start
     events:
       - sqs:
-          arn:
-            Fn::GetAtt:
-              - CPMSLaunchedPayments
-              - Arn
+          arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
   check:
     handler: handler.check
 
