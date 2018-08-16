@@ -15,14 +15,6 @@ provider:
         - "sqs:DeleteMessage"
         - "sqs:GetQueueAttributes"
       Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
-    - Effect: "Allow"
-      Action: 
-        - "Lambda:InvokeFunction"
-      Resource:  arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:rsp-payments-*
-    - Effect: "Allow"
-      Action: 
-        - "Lambda:InvokeFunction"
-      Resource:  arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:rsp-cpms-orchestration-*
 
 custom:
   initialWait: 1

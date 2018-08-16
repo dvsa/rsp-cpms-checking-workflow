@@ -62,6 +62,9 @@
     "wait-on": "^2.0.2"
   },
   "dependencies": {
-    "aws-sdk": "^2.140.0"
+    "aws-sdk": "^2.140.0",
+    "aws4": "^1.8.0",
+    "axios": "^0.18.0",
+    "url-parse": "^1.4.3"
   }
 }
