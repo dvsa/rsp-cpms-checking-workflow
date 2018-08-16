@@ -1,20 +1,24 @@
-import { StepFunctions } from 'aws-sdk';
+import { SQS, config } from 'aws-sdk';
 
-const stepfunctions = new StepFunctions();
+import QueueService from '../services/queueService';
 
-export default (event, context, callback) => {
-	const stateMachineArn = process.env.statemachine_arn;
-	const params = {
-		stateMachineArn,
-		input: JSON.stringify(event),
-	};
+config.update({ region: 'eu-west-1' });
+const sqs = new SQS({ apiVersion: '2012-11-05' });
 
-	return stepfunctions.startExecution(params).promise().then(() => {
-		callback(null, {
-			message: `Your statemachine ${stateMachineArn} executed successfully`,
-			data: event,
-		});
-	}).catch((error) => {
-		callback(error.message);
-	});
+const queueService = new QueueService(sqs, process.env.SQS_URL);
+
+export default async (event) => {
+	const { PaymentCode, VehicleRegistration, ReceiptReference } = event;
+	try {
+		// Send a message to the CPMS checking queue
+		const messageData = await queueService.sendMessage(
+			ReceiptReference,
+			PaymentCode,
+			VehicleRegistration,
+		);
+		console.log('send message to queue success', messageData);
+		return messageData;
+	} catch (err) {
+		return err;
+	}
 };

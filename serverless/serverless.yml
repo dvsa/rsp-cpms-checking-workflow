@@ -10,14 +10,11 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action: 
+        - "sqs:SendMessage"
         - "sqs:ReceiveMessage"
         - "sqs:DeleteMessage"
         - "sqs:GetQueueAttributes"
       Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
-    - Effect: "Allow"
-      Action:
-        - "states:StartExecution"
-      Resource: "*"
 
 custom:
   initialWait: 1
@@ -26,11 +23,6 @@ custom:
 functions:
   start:
     handler: handler.start
-    events:
-      - sqs:
-          arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
-    environment:
-      statemachine_arn: ${self:resources.Outputs.cpmsCheckingStateMachine.Value}
   check:
     handler: handler.check
 
@@ -41,6 +33,10 @@ stepFunctions:
         Comment: "A state machine to check if launched CPMS payments have been successful"
         StartAt: wait
         States:
+          StartState:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-start
+            Next: wait
           wait:
             Type: Wait
             Seconds: ${self:custom.initialWait}
