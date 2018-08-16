@@ -26,10 +26,6 @@ export default class QueueService {
 			QueueUrl: this.sqsQueueUrl,
 		};
 
-		return new Promise((resolve, reject) => {
-			this.sqs.sendMessage(params).promise()
-				.then(data => resolve(data))
-				.catch(err => reject(err));
-		});
+		return this.sqs.sendMessage(params).promise();
 	}
 }
