@@ -28,4 +28,12 @@ export default class QueueService {
 
 		return this.sqs.sendMessage(params).promise();
 	}
+
+	receiveMessage(params) {
+		return this.sqs.receiveMessage(params).promise();
+	}
+
+	deleteMessage(params) {
+		return this.sqs.deleteMessage(params).promise();
+	}
 }

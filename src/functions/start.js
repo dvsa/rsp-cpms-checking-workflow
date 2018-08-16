@@ -11,7 +11,7 @@ const queueService = new QueueService(sqs, appConfig.sqsUrl);
 
 export default (event, context, callback) => {
 	const {
-		PaymentCode,
+		PenaltyId,
 		VehicleRegistration,
 		ReceiptReference,
 		IsGroupPayment,
@@ -19,7 +19,7 @@ export default (event, context, callback) => {
 	// Send a message to the CPMS checking queue
 	queueService.sendMessage(
 		ReceiptReference,
-		PaymentCode,
+		PenaltyId,
 		VehicleRegistration,
 		IsGroupPayment,
 	)
