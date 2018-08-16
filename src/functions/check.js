@@ -6,7 +6,7 @@ const paymentHttpClient = new SignedHttpClient(appConfig.paymentServiceUrl);
 
 export default (event, context, callback) => {
 	const {
-		ReceiptReference,
+		ReceiptReference, // eslint-disable-line
 		IsGroupPayment,
 		PenaltyId,
 		PenaltyType,
