@@ -7,18 +7,14 @@ const sqs = new SQS({ apiVersion: '2012-11-05' });
 
 const queueService = new QueueService(sqs, process.env.SQS_URL);
 
-export default async (event) => {
+export default (event, context, callback) => {
 	const { PaymentCode, VehicleRegistration, ReceiptReference } = event;
-	try {
-		// Send a message to the CPMS checking queue
-		const messageData = await queueService.sendMessage(
-			ReceiptReference,
-			PaymentCode,
-			VehicleRegistration,
-		);
-		console.log('send message to queue success', messageData);
-		return messageData;
-	} catch (err) {
-		return err;
-	}
+	// Send a message to the CPMS checking queue
+	queueService.sendMessage(
+		ReceiptReference,
+		PaymentCode,
+		VehicleRegistration,
+	)
+		.then(messageData => callback(null, messageData))
+		.catch(err => callback(err));
 };
