@@ -31,7 +31,7 @@ stepFunctions:
     cpmsCheckingStateMachine:
       definition:
         Comment: "A state machine to check if launched CPMS payments have been successful"
-        StartAt: wait
+        StartAt: StartState
         States:
           StartState:
             Type: Task
