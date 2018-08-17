@@ -15,6 +15,10 @@ export default (event, context, callback) => {
 	paymentsService.getPaymentRecord(IsGroupPayment, PenaltyId)
 		.then((response) => {
 			const item = response.data;
+			console.log('logging respose');
+			console.log(response);
+			console.log('logging item');
+			console.log(item);
 			if (typeof item === 'undefined' || isEmptyObject(item)) return callback(null, { paymentRecordFound: false, ...event });
 			return callback(null, { paymentRecordFound: true, ...event });
 		})

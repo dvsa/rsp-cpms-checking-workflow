@@ -9,21 +9,25 @@ export default class PaymentsService {
 	async getPaymentRecord(IsGroupPayment, PenaltyId) {
 		// Check if payment was recorded in the appropriate payments table;
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
-		return new Promise((resolve, reject) => {
-			try {
-				const response = this.paymentHttpClient.get(`${getPaymentPath}/${PenaltyId}`);
-				const { item } = response;
-				const itemNotFound = typeof item === 'undefined' || isEmptyObject(item);
-				if (itemNotFound) return reject(new Error('Item not found'));
-				return resolve(item);
-			} catch (err) {
-				if (err.response.status === 404) return reject(err);
-				return reject(err);
-			}
-		});
+		try {
+			const response = await this.paymentHttpClient.get(`${getPaymentPath}/${PenaltyId}`);
+			const item = response.data;
+			const itemNotFound = typeof item === 'undefined' || isEmptyObject(item);
+			if (itemNotFound) throw new Error('Item not found');
+			return item;
+		} catch (err) {
+			if (err.message === 'Item not found') throw err;
+			if (err.response.status === 404) throw err;
+			throw err;
+		}
 	}
-	createPaymentRecord(IsGroupPayment) {
+	async createPaymentRecord(IsGroupPayment, body) {
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
-		this.paymentHttpClient.post(`${getPaymentPath}`);
+		try {
+			const paymentRecord = await this.paymentHttpClient.post(`${getPaymentPath}`, body);
+			return paymentRecord;
+		} catch (err) {
+			throw err;
+		}
 	}
 }
