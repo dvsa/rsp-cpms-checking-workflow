@@ -1,15 +1,11 @@
-import start from './functions/start';
 import check from './functions/check';
-import createPaymentRecord from './functions/createPaymentRecord';
 import checkCpmsConfirm from './functions/checkCpmsConfirm';
-import silentEnd from './functions/silentEnd';
+import checkForOrphanedPayments from './functions/checkForOrphanedPayments';
 
 const handler = {
-	start,
 	check,
-	createPaymentRecord,
 	checkCpmsConfirm,
-	silentEnd,
+	checkForOrphanedPayments,
 };
 
 export default handler;

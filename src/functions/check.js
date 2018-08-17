@@ -1,8 +1,9 @@
 import SignedHttpClient from '../utils/httpClient';
 import appConfig from '../config';
 import isEmptyObject from '../utils/isEmptyObject';
+import PaymentsService from '../services/payments';
 
-const paymentHttpClient = new SignedHttpClient(appConfig.paymentServiceUrl);
+const paymentsService = new PaymentsService();
 
 export default (event, context, callback) => {
 	const {
@@ -11,10 +12,7 @@ export default (event, context, callback) => {
 		PenaltyId,
 		PenaltyType,
 	} = event;
-	// Check if payment was recorded in the appropriate payments table;
-	const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
-	const penaltyTypeSuffix = IsGroupPayment ? '' : `_${PenaltyType}`;
-	paymentHttpClient.get(`${getPaymentPath}/${PenaltyId}${penaltyTypeSuffix}`)
+	paymentsService.getPaymentRecord(IsGroupPayment, PenaltyId)
 		.then((response) => {
 			const item = response.data;
 			if (typeof item === 'undefined' || isEmptyObject(item)) return callback(null, { paymentRecordFound: false, ...event });

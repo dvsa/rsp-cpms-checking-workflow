@@ -24,21 +24,22 @@ functions:
     events:
       - sqs:
           arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
+          batchSize: 1
 
 plugins:
   - serverless-step-functions
   - serverless-pseudo-parameters
 
-resources:
-  Resources:
-    LaunchedPayments:
-      Type: "AWS::SQS::Queue"
-      Properties:
-        QueueName: "LaunchedPayments"
-        RedrivePolicy:
-          deadLetterTargetArn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:DeadLetterLaunchedPayments
-          maxReceiveCount: 4
-    DeadLetterLaunchedPayments:
-      Type: "AWS::SQS::Queue"
-      Properties:
-        QueueName: "DeadLetterLaunchedPayments"
+# resources:
+#   Resources:
+#     DeadLetterLaunchedPayments:
+#       Type: "AWS::SQS::Queue"
+#       Properties:
+#         QueueName: "DeadLetterLaunchedPayments"
+#     LaunchedPayments:
+#       Type: "AWS::SQS::Queue"
+#       Properties:
+#         QueueName: "LaunchedPayments"
+#         RedrivePolicy:
+#           deadLetterTargetArn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:DeadLetterLaunchedPayments
+#           maxReceiveCount: 4
