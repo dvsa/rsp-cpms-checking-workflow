@@ -12,7 +12,7 @@ provider:
         - "sqs:ReceiveMessage"
         - "sqs:DeleteMessage"
         - "sqs:GetQueueAttributes"
-      Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
+      Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
 
 # custom:
 #   initialWait: 1
