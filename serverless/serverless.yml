@@ -5,8 +5,6 @@ provider:
   runtime: nodejs6.10
   stage: dev
   region: eu-west-1
-  environment:
-    statemachine_arn: ${self:resources.Outputs.cpmsCheckingStateMachine.Value}
   iamRoleStatements:
     - Effect: "Allow"
       Action: 
@@ -16,9 +14,9 @@ provider:
         - "sqs:GetQueueAttributes"
       Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:CPMS_Launched_Payments
 
-custom:
-  initialWait: 1
-  maxAttempts: 4
+# custom:
+#   initialWait: 1
+#   maxAttempts: 4
 
 functions:
   checkForOrphanedPayments:
