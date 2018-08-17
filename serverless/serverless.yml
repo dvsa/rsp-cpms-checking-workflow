@@ -21,81 +21,11 @@ custom:
   maxAttempts: 4
 
 functions:
-  start:
-    handler: handler.start
-  check:
-    handler: handler.check
-  createPaymentRecord:
-    handler: handler.createPaymentRecord
-  checkCpmsConfirm:
-    handler: handler.checkCpmsConfirm
-  silentEnd:
-    handler: handler.silentEnd
-
-stepFunctions:
-  stateMachines:
-    cpmsCheckingStateMachine:
-      definition:
-        Comment: "A state machine to check if launched CPMS payments have been successful"
-        StartAt: wait
-        States:
-          # StartState:
-          #   Type: Task
-          #   Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-start
-          #   Next: wait
-          wait:
-            Type: Wait
-            Seconds: ${self:custom.initialWait}
-            Next: CheckState
-          CheckState:
-            Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-check
-            Next: ChoiceState
-          ChoiceState:
-            Type: Choice
-            Choices:
-            - Variable: "$.paymentRecordFound"
-              BooleanEquals: true
-              Next: SilentEndState
-            - Variable: "$.paymentRecordFound"
-              BooleanEquals: false
-              Next: PaymentRecordNotFoundState
-            Default: SilentEndState
-          # PaymentRecordFoundState:
-          #   Type: Task
-          #   Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-createPaymentRecord
-          #   End: true
-          PaymentRecordNotFoundState:
-            Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-checkCpmsConfirm
-            Next: CpmsPaymentChoiceState
-          CpmsPaymentChoiceState:
-            Type: Choice
-            Choices:
-              - Variable: "$.paymentConfirmedInCpms"
-                BooleanEquals: true
-                Next: CreatePaymentRecordState
-              - Variable: "$.paymentConfirmedInCpms"
-                BooleanEquals: false
-                Next: CheckCpmsConfirmRetryState
-          CreatePaymentRecordState:
-            Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-createPaymentRecord
-            End: true
-          CheckCpmsConfirmRetryState:
-            Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-checkCpmsConfirm
-            Next: SilentEndState
-            Retry:
-            - ErrorEquals:
-              - HandledError
-              IntervalSeconds: 300
-              MaxAttempts: 3
-              BackoffRate: 3
-          SilentEndState:
-            Type: Task
-            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${opt:stage}-silentEndState
-            End: true
+  checkForOrphanedPayments:
+    handler: handler.checkForOrphanedPayments
+    events:
+      - sqs:
+          arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
 
 plugins:
   - serverless-step-functions
@@ -103,7 +33,14 @@ plugins:
 
 resources:
   Resources:
-    CPMSLaunchedPayments:
+    LaunchedPayments:
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: "CPMS_Launched_Payments"
+        QueueName: "LaunchedPayments"
+        RedrivePolicy:
+          deadLetterTargetArn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:DeadLetterLaunchedPayments
+          maxReceiveCount: 4
+    DeadLetterLaunchedPayments:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "DeadLetterLaunchedPayments"
