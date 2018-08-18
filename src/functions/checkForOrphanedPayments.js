@@ -8,6 +8,7 @@ const cpmsService = new CpmsService();
 const documentsService = new DocumentsService();
 
 export default async (event, context, callback) => {
+	// Lambda SQS integration must have a batchSize of 1
 	const message = event.Records[0];
 	const {
 		PenaltyType,
@@ -38,6 +39,7 @@ export default async (event, context, callback) => {
 						const document = await documentsService.getDocument(IsGroupPayment, PenaltyId);
 						console.log(document);
 						// Create the payment record and exit
+						// TODO: Ensure document is the correct body for createPaymentRecord
 						const paymentRecord = await paymentsService.createPaymentRecord(
 							IsGroupPayment,
 							document,
