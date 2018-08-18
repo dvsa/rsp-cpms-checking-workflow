@@ -21,7 +21,7 @@ export default async (event, context, callback) => {
 		// Check if the payment is in the payments table
 		const item = await paymentsService.getPaymentRecord(IsGroupPayment, PenaltyId);
 		// Exit and delete message off the queue
-		callback(null, item);
+		return callback(null, item);
 	} catch (getPaymentRecordError) {
 		// If the item doesn't exist, check in cpms
 		if (getPaymentRecordError.message === 'Item not found' || getPaymentRecordError.response.status === 404) {
@@ -42,16 +42,19 @@ export default async (event, context, callback) => {
 							IsGroupPayment,
 							document,
 						);
-						callback(null, paymentRecord);
+						// Succeed when payment record has been created
+						return callback(null, paymentRecord);
 					} catch (getDocumentOrCreatePaymentRecordError) {
-						callback(getDocumentOrCreatePaymentRecordError);
+						return callback(getDocumentOrCreatePaymentRecordError);
 					}
 				}
+				return callback(new Error(`CPMS couldn't confirm payment, code: ${code} `));
 			} catch (cpmsConfirmError) {
 				console.log('cpmsConfirmError from lambda');
 				console.log(cpmsConfirmError);
+				return callback(cpmsConfirmError);
 			}
 		}
-		callback(getPaymentRecordError);
+		return callback(getPaymentRecordError);
 	}
 };
