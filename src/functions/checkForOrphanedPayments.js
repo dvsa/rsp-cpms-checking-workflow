@@ -23,7 +23,7 @@ export default async (event, context, callback) => {
 		// Exit and delete message off the queue
 		callback(null, item);
 	} catch (getPaymentRecordError) {
-		// If the item doesn't exit, check in cpms
+		// If the item doesn't exist, check in cpms
 		if (getPaymentRecordError.message === 'Item not found' || getPaymentRecordError.response.status === 404) {
 			try {
 				const code = await cpmsService.confirm(PenaltyType, ReceiptReference);
