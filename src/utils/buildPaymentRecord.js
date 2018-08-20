@@ -1,11 +1,14 @@
+import parsePenaltyGroup from '../utils/parsePenaltyGroup';
+
 export default (IsGroupPayment, PenaltyType, document, paymentDetails) => {
 	if (IsGroupPayment) {
 		const { ID } = document;
+		const parsedPenaltyGroupDocument = parsePenaltyGroup(document);
 		return buildGroupPaymentPayload(
 			ID,
 			paymentDetails.ReceiptReference,
 			PenaltyType,
-			document,
+			parsedPenaltyGroupDocument,
 			paymentDetails.authCode,
 		);
 	}
