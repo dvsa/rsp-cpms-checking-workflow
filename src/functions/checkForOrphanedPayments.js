@@ -2,6 +2,7 @@ import parseMessageAttributes from '../utils/parseMessageAttributes';
 import PaymentsService from '../services/payments';
 import CpmsService from '../services/cpms';
 import DocumentsService from '../services/documents';
+import buildPaymentRecord from '../utils/buildPaymentRecord';
 
 const paymentsService = new PaymentsService();
 const cpmsService = new CpmsService();
@@ -27,7 +28,7 @@ export default async (event, context, callback) => {
 		// If the item doesn't exist, check in cpms
 		if (getPaymentRecordError.message === 'Item not found' || getPaymentRecordError.response.status === 404) {
 			try {
-				const code = await cpmsService.confirm(PenaltyType, ReceiptReference);
+				const { code, auth_code } = await cpmsService.confirm(PenaltyType, ReceiptReference); // eslint-disable-line
 				console.log('code from lambda');
 				console.log(code);
 				// If payment is confirmed by CPMS, create a record in the payments table
@@ -38,19 +39,23 @@ export default async (event, context, callback) => {
 						console.log('getting document');
 						const document = await documentsService.getDocument(IsGroupPayment, PenaltyId);
 						console.log(document);
+						const paymentRecord = buildPaymentRecord(IsGroupPayment, PenaltyType, document, {
+							authCode: auth_code,
+							receiptReference: ReceiptReference,
+						});
 						// Create the payment record and exit
 						// TODO: Ensure document is the correct body for createPaymentRecord
-						const paymentRecord = await paymentsService.createPaymentRecord(
+						const createPaymentRecordResponse = await paymentsService.createPaymentRecord(
 							IsGroupPayment,
-							document,
+							paymentRecord,
 						);
 						// Succeed when payment record has been created
-						return callback(null, paymentRecord);
+						return callback(null, createPaymentRecordResponse);
 					} catch (getDocumentOrCreatePaymentRecordError) {
 						return callback(getDocumentOrCreatePaymentRecordError);
 					}
 				}
-				return callback(new Error(`CPMS couldn't confirm payment, code: ${code} `));
+				return callback(new Error(`CPMS payment unsuccessful, code: ${code} `));
 			} catch (cpmsConfirmError) {
 				console.log('cpmsConfirmError from lambda');
 				console.log(cpmsConfirmError);

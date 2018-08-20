@@ -13,7 +13,7 @@ export default class CpmsService {
 			});
 			console.log('response from cpms service');
 			console.log(response);
-			return response.data.code;
+			return response.data;
 		} catch (err) {
 			console.log('err from cpms service');
 			console.log(err);
