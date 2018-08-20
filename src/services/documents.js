@@ -8,8 +8,8 @@ export default class DocumentsService {
 	async getDocument(IsGroupPayment, PenaltyId) {
 		const endpoint = IsGroupPayment ? 'penaltyGroup' : 'documents';
 		try {
-			const document = await this.documentsHttpClient.get(`${endpoint}/${PenaltyId}`);
-			return document;
+			const response = await this.documentsHttpClient.get(`${endpoint}/${PenaltyId}`);
+			return response.data;
 		} catch (err) {
 			throw err;
 		}
