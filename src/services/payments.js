@@ -24,8 +24,8 @@ export default class PaymentsService {
 	async createPaymentRecord(IsGroupPayment, body) {
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
 		try {
-			const paymentRecord = await this.paymentHttpClient.post(`${getPaymentPath}`, body);
-			return paymentRecord;
+			const { data } = await this.paymentHttpClient.post(getPaymentPath, body);
+			return data;
 		} catch (err) {
 			throw err;
 		}

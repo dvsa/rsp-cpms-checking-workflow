@@ -21,7 +21,7 @@ export default (IsGroupPayment, PenaltyType, document, paymentDetails) => {
 		PenaltyReference: referenceNo,
 		PaymentDetail: {
 			PaymentMethod: 'CARD',
-			PaymentRef: paymentDetails.ReceiptReference,
+			PaymentRef: paymentDetails.receiptReference,
 			AuthCode: paymentDetails.authCode,
 			PaymentAmount: penaltyAmount,
 			PaymentDate: Math.round((new Date()).getTime() / 1000),

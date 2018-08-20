@@ -31,20 +31,18 @@ export default async (event, context, callback) => {
 				const { code, auth_code } = await cpmsService.confirm(PenaltyType, ReceiptReference); // eslint-disable-line
 				console.log('code from lambda');
 				console.log(code);
+				// If the payment was cancelled, exit and delete the message from the queue
+				if (code === 807) return callback(null, 'Payment was cancelled');
 				// If payment is confirmed by CPMS, create a record in the payments table
 				if (code === 801) {
-					console.log('payment successful');
 					try {
 						// Fetch the document from the documents service
-						console.log('getting document');
 						const document = await documentsService.getDocument(IsGroupPayment, PenaltyId);
-						console.log(document);
 						const paymentRecord = buildPaymentRecord(IsGroupPayment, PenaltyType, document, {
 							authCode: auth_code,
 							receiptReference: ReceiptReference,
 						});
 						// Create the payment record and exit
-						// TODO: Ensure document is the correct body for createPaymentRecord
 						const createPaymentRecordResponse = await paymentsService.createPaymentRecord(
 							IsGroupPayment,
 							paymentRecord,
@@ -57,8 +55,6 @@ export default async (event, context, callback) => {
 				}
 				return callback(new Error(`CPMS payment unsuccessful, code: ${code} `));
 			} catch (cpmsConfirmError) {
-				console.log('cpmsConfirmError from lambda');
-				console.log(cpmsConfirmError);
 				return callback(cpmsConfirmError);
 			}
 		}
