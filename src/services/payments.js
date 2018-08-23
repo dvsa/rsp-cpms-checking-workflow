@@ -6,7 +6,7 @@ export default class PaymentsService {
 	constructor() {
 		this.paymentHttpClient = new SignedHttpClient(appConfig.paymentServiceUrl);
 	}
-	async getPaymentRecord(IsGroupPayment, PenaltyId) {
+	async getPaymentRecord(IsGroupPayment, PenaltyId, PenaltyType) {
 		// Check if payment was recorded in the appropriate payments table;
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
 		try {
@@ -14,7 +14,10 @@ export default class PaymentsService {
 			const item = response.data;
 			const itemNotFound = typeof item === 'undefined' || isEmptyObject(item);
 			if (itemNotFound) throw new Error('Item not found');
-			return item;
+			// Return payment record for a specific penalty in a penalty group
+			const payment = item.Payments.find(p => p.PaymentCategory === PenaltyType);
+			if (typeof payment === 'undefined') throw new Error(`Payment for type: ${PenaltyType} not found in item`);
+			return payment;
 		} catch (err) {
 			if (err.message === 'Item not found') throw err;
 			if (err.response.status === 404) throw err;

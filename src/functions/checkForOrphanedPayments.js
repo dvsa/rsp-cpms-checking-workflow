@@ -10,23 +10,25 @@ const documentsService = new DocumentsService();
 
 export default async (event, context, callback) => {
 	// Lambda SQS integration must have a batchSize of 1
-	const message = event.Records[0];
+	const { messageAttributes } = event.Records[0];
 	const {
 		PenaltyType,
 		ReceiptReference,
 		PenaltyId,
 		IsGroupPayment,
-	} = parseMessageAttributes(message.messageAttributes);
+	} = parseMessageAttributes(messageAttributes);
 	try {
 		console.log('messageAttributes');
-		console.log(parseMessageAttributes(message.messageAttributes));
+		console.log(parseMessageAttributes(messageAttributes));
 		// Check if the payment is in the payments table
-		const item = await paymentsService.getPaymentRecord(IsGroupPayment, PenaltyId);
+		const item = await paymentsService.getPaymentRecord(IsGroupPayment, PenaltyId, PenaltyType);
 		// Exit and delete message off the queue
 		return callback(null, item);
 	} catch (getPaymentRecordError) {
 		// If the item doesn't exist, check in cpms
-		if (getPaymentRecordError.message === 'Item not found' || getPaymentRecordError.response.status === 404) {
+		const notFoundErrors = [`Payment for type: ${PenaltyType} not found in item`, 'Item not found'];
+		const { message } = getPaymentRecordError;
+		if (notFoundErrors.includes(message) || getPaymentRecordError.response.status === 404) {
 			try {
 				const { code, auth_code } = await cpmsService.confirm(PenaltyType, ReceiptReference); // eslint-disable-line
 				console.log('code from lambda');
