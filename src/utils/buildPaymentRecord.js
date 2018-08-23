@@ -1,8 +1,9 @@
 import parsePenaltyGroup from '../utils/parsePenaltyGroup';
 
 export default (IsGroupPayment, PenaltyType, document, paymentDetails) => {
+	const isImmobilisation = PenaltyType === 'IM';
+	const { ID } = document;
 	if (IsGroupPayment) {
-		const { ID } = document;
 		const parsedPenaltyGroupDocument = parsePenaltyGroup(document);
 		return buildGroupPaymentPayload(
 			ID,
@@ -21,7 +22,7 @@ export default (IsGroupPayment, PenaltyType, document, paymentDetails) => {
 		PaymentCode: paymentToken,
 		PenaltyStatus: 'PAID',
 		PenaltyType,
-		PenaltyReference: referenceNo,
+		PenaltyReference: isImmobilisation ? ID.substr(0, ID.indexOf('_')) : referenceNo,
 		PaymentDetail: {
 			PaymentMethod: 'CARD',
 			PaymentRef: paymentDetails.receiptReference,
