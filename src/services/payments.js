@@ -15,9 +15,12 @@ export default class PaymentsService {
 			const itemNotFound = typeof item === 'undefined' || isEmptyObject(item);
 			if (itemNotFound) throw new Error('Item not found');
 			// Return payment record for a specific penalty in a penalty group
-			const payment = item.Payments[PenaltyType];
-			if (typeof payment === 'undefined') throw new Error(`Payment for type: ${PenaltyType} not found in item`);
-			return payment;
+			if (IsGroupPayment) {
+				const payment = item.Payments[PenaltyType];
+				if (typeof payment === 'undefined') throw new Error(`Payment for type: ${PenaltyType} not found in item`);
+				return payment;
+			}
+			return item;
 		} catch (err) {
 			if (err.message === 'Item not found') throw err;
 			if (typeof err.response !== 'undefined' && err.response.status === 404) throw new Error('Item not found');

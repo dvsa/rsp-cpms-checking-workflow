@@ -48,6 +48,7 @@ export default async (event, context, callback) => {
 							IsGroupPayment,
 							paymentRecord,
 						);
+						console.log('payment record created, calling back with success');
 						// Succeed when payment record has been created
 						return callback(null, createPaymentRecordResponse);
 					} catch (getDocumentOrCreatePaymentRecordError) {

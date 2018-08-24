@@ -11,12 +11,8 @@ export default class CpmsService {
 				receipt_reference: receiptReference,
 				penalty_type: penaltyType,
 			});
-			console.log('response from cpms service');
-			console.log(response);
 			return response.data;
 		} catch (err) {
-			console.log('err from cpms service');
-			console.log(err);
 			throw err;
 		}
 	}
