@@ -1,8 +1,7 @@
-import parseMessageAttributes from '../utils/parseMessageAttributes';
 import PaymentsService from '../services/payments';
 import CpmsService from '../services/cpms';
 import DocumentsService from '../services/documents';
-import buildPaymentRecord from '../utils/buildPaymentRecord';
+import Utils from '../services/utils';
 
 const paymentsService = new PaymentsService();
 const cpmsService = new CpmsService();
@@ -16,10 +15,10 @@ export default async (event, context, callback) => {
 		ReceiptReference,
 		PenaltyId,
 		IsGroupPayment,
-	} = parseMessageAttributes(messageAttributes);
+	} = Utils.parseMessageAttributes(messageAttributes);
 	try {
 		console.log('messageAttributes');
-		console.log(parseMessageAttributes(messageAttributes));
+		console.log(Utils.parseMessageAttributes(messageAttributes));
 		// Check if the payment is in the payments table
 		const payment = await paymentsService.getPaymentRecord(IsGroupPayment, PenaltyId, PenaltyType);
 		// Exit and delete message off the queue
@@ -40,7 +39,7 @@ export default async (event, context, callback) => {
 					try {
 						// Fetch the document from the documents service
 						const document = await documentsService.getDocument(IsGroupPayment, PenaltyId);
-						const paymentRecord = buildPaymentRecord(IsGroupPayment, PenaltyType, document, {
+						const paymentRecord = Utils.buildPaymentRecord(IsGroupPayment, PenaltyType, document, {
 							authCode: auth_code,
 							receiptReference: ReceiptReference,
 						});
