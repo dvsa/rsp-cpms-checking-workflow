@@ -76,7 +76,7 @@ describe('checkForOrphanedPayments', () => {
 
 	});
 
-	describe('when a payment record has not been created and the payment was cancelled', () => {
+	describe('when a payment record has not been created and the payment was successful', () => {
 		const doc = { doc: 'doc' };
 		before(() => {
 			sinon.stub(PaymentsService.prototype, 'getPaymentRecord').throws(new Error('Item not found'));
