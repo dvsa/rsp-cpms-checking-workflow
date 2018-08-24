@@ -1,0 +1,48 @@
+service: rsp-cpms-checking
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: eu-west-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: 
+        - "sqs:SendMessage"
+        - "sqs:ReceiveMessage"
+        - "sqs:DeleteMessage"
+        - "sqs:GetQueueAttributes"
+      Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
+
+custom:
+  initialWait: 180
+  maxAttempts: 4
+  retryWait: 300
+
+functions:
+  checkForOrphanedPayments:
+    handler: handler.checkForOrphanedPayments
+    events:
+      - sqs:
+          arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
+          batchSize: 1
+
+plugins:
+  - serverless-step-functions
+  - serverless-pseudo-parameters
+
+resources:
+  Resources:
+    DeadLetterLaunchedPayments:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "DeadLetterLaunchedPayments"
+    LaunchedPayments:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "LaunchedPayments"
+        DelaySeconds: ${self:custom.initialWait}
+        VisibilityTimeout: ${self:custom.retryWait}
+        RedrivePolicy:
+          deadLetterTargetArn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:DeadLetterLaunchedPayments
+          maxReceiveCount: ${self:custom.maxAttempts}
