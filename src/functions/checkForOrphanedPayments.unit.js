@@ -6,15 +6,19 @@ import PaymentsService from '../services/payments';
 import CpmsService from '../services/cpms';
 // import DocumentsService from '../services/documents';
 import Utils from '../services/utils';
+import DocumentsService from '../services/documents';
 
 describe('checkForOrphanedPayments', () => {
 
 	let event;
 
 	afterEach(() => {
-		PaymentsService.prototype.getPaymentRecord.restore();
-		Utils.parseMessageAttributes.restore();
-		Utils.buildPaymentRecord.restore();
+		if (typeof PaymentsService.prototype.getPaymentRecord.restore === 'function') PaymentsService.prototype.getPaymentRecord.restore();
+		if (typeof PaymentsService.prototype.createPaymentRecord.restore === 'function') PaymentsService.prototype.createPaymentRecord.restore();
+		if (typeof Utils.parseMessageAttributes.restore === 'function') Utils.parseMessageAttributes.restore();
+		if (typeof Utils.buildPaymentRecord.restore === 'function') Utils.buildPaymentRecord.restore();
+		if (typeof DocumentsService.prototype.getDocument.restore === 'function') DocumentsService.prototype.getDocument.restore();
+		if (typeof CpmsService.prototype.confirm.restore === 'function') CpmsService.prototype.confirm.restore();
 	});
 
 	beforeEach(() => {
@@ -41,7 +45,6 @@ describe('checkForOrphanedPayments', () => {
 		it('should exit with success', (done) => {
 			checkForOrphanedPayments(event, null, (err, res) => {
 				expect(err).toBe(null);
-				expect(Utils.parseMessageAttributes.getCall(0).args[0]).toEqual({});
 				expect(getPaymentRecordStub.getCall(0).args).toEqual(['group', 'id', 'type']);
 				expect(res).toEqual({ payment: 'payment' });
 				done();
@@ -66,6 +69,37 @@ describe('checkForOrphanedPayments', () => {
 				expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
 				expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
 				expect(res).toEqual('Payment was cancelled');
+				done();
+			});
+
+		});
+
+	});
+
+	describe('when a payment record has not been created and the payment was cancelled', () => {
+		const doc = { doc: 'doc' };
+		before(() => {
+			sinon.stub(PaymentsService.prototype, 'getPaymentRecord').throws(new Error('Item not found'));
+			sinon.stub(CpmsService.prototype, 'confirm').resolves({
+				code: 801,
+				auth_code: 'auth_code',
+			});
+			sinon.stub(DocumentsService.prototype, 'getDocument').resolves(doc);
+			sinon.stub(PaymentsService.prototype, 'createPaymentRecord').resolves({ createdDoc: 'yes' });
+		});
+
+		it('should call the correct services and exit with success', (done) => {
+
+			checkForOrphanedPayments(event, null, (err, res) => {
+				expect(err).toBe(null);
+				expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
+				expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
+				expect(DocumentsService.prototype.getDocument.getCall(0).args).toEqual(['group', 'id']);
+				expect(Utils.buildPaymentRecord.getCall(0).args).toEqual(['group', 'type', doc, {
+					authCode: 'auth_code',
+					receiptReference: 'ref',
+				}]);
+				expect(res).toEqual({ createdDoc: 'yes' });
 				done();
 			});
 
