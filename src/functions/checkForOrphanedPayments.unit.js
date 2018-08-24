@@ -4,7 +4,6 @@ import sinon from 'sinon';
 import checkForOrphanedPayments from './checkForOrphanedPayments';
 import PaymentsService from '../services/payments';
 import CpmsService from '../services/cpms';
-// import DocumentsService from '../services/documents';
 import Utils from '../services/utils';
 import DocumentsService from '../services/documents';
 
