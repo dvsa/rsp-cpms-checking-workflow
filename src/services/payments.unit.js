@@ -50,7 +50,19 @@ describe('payments service', () => {
 			paymentsSvc.getPaymentRecord(false, 'id', 'type')
 				.then((res) => {
 					expect(mockGet.getCall(0).args[0]).toEqual('payments/id');
-					expect(res).toEqual('payment');
+					expect(res).toEqual(mockPaymentGetResponse.data);
+					done();
+				});
+		});
+
+	});
+
+	describe('when createPaymentRecord is called for a single penalty payment', () => {
+		it('should should call the correct endpoint on the http client', (done) => {
+			paymentsSvc.createPaymentRecord(false, mockPaymentRecord)
+				.then((res) => {
+					expect(mockPost.getCall(0).args[0]).toEqual('payments');
+					expect(res).toEqual('data');
 					done();
 				});
 		});
@@ -59,9 +71,9 @@ describe('payments service', () => {
 
 	describe('when createPaymentRecord is called for a group payment', () => {
 		it('should should call the correct endpoint on the http client', (done) => {
-			paymentsSvc.createPaymentRecord(false, mockPaymentRecord)
+			paymentsSvc.createPaymentRecord(true, mockPaymentRecord)
 				.then((res) => {
-					expect(mockPost.getCall(0).args[0]).toEqual('payments');
+					expect(mockPost.getCall(0).args[0]).toEqual('groupPayments');
 					expect(res).toEqual('data');
 					done();
 				});
