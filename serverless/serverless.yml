@@ -30,6 +30,7 @@ functions:
 plugins:
   - serverless-step-functions
   - serverless-pseudo-parameters
+  - serverless-offline
 
 resources:
   Resources:
