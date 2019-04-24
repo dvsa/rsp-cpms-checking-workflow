@@ -63,7 +63,7 @@ describe('checkForOrphanedPayments', () => {
 			const res = await checkForOrphanedPayments(event);
 			expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
 			expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
-			expect(res).toEqual('Payment was cancelled');
+			expect(res).toEqual('Payment cancelled with receipt reference ref. Removing from SQS queue.');
 
 		});
 

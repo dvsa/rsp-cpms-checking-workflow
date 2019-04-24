@@ -1,6 +1,7 @@
 import SignedHttpClient from '../utils/httpClient';
 import appConfig from '../config';
 import isEmptyObject from '../utils/isEmptyObject';
+import { logError, StatusCode } from '../logger';
 
 export default class PaymentsService {
 	constructor() {
@@ -33,6 +34,7 @@ export default class PaymentsService {
 			const { data } = await this.paymentHttpClient.post(getPaymentPath, body);
 			return data;
 		} catch (err) {
+			logError(StatusCode.PaymentServiceError, err.message);
 			throw err;
 		}
 	}

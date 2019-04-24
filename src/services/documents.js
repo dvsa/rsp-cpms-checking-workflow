@@ -1,5 +1,6 @@
 import SignedHttpClient from '../utils/httpClient';
 import appConfig from '../config';
+import { StatusCode, logError } from '../logger';
 
 export default class DocumentsService {
 	constructor() {
@@ -11,6 +12,10 @@ export default class DocumentsService {
 			const response = await this.documentsHttpClient.get(`${endpoint}/${PenaltyId}`);
 			return response.data;
 		} catch (err) {
+			logError({
+				statusCode: StatusCode.DocumentsServiceError,
+				message: err.message,
+			});
 			throw err;
 		}
 	}
