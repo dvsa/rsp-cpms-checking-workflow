@@ -41,13 +41,10 @@ describe('checkForOrphanedPayments', () => {
 			getPaymentRecordStub = sinon.stub(PaymentsService.prototype, 'getPaymentRecord').resolves({ payment: 'payment' });
 		});
 
-		it('should exit with success', (done) => {
-			checkForOrphanedPayments(event, null, (err, res) => {
-				expect(err).toBe(null);
-				expect(getPaymentRecordStub.getCall(0).args).toEqual(['group', 'id', 'type']);
-				expect(res).toEqual({ payment: 'payment' });
-				done();
-			});
+		it('should exit with success', async () => {
+			const res = await checkForOrphanedPayments(event);
+			expect(getPaymentRecordStub.getCall(0).args).toEqual(['group', 'id', 'type']);
+			expect(res).toEqual({ payment: 'payment' });
 		});
 
 	});
@@ -61,15 +58,12 @@ describe('checkForOrphanedPayments', () => {
 			});
 		});
 
-		it('should exit with success saying the payment had been cancelled', (done) => {
+		it('should exit with success saying the payment had been cancelled', async () => {
 
-			checkForOrphanedPayments(event, null, (err, res) => {
-				expect(err).toBe(null);
-				expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
-				expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
-				expect(res).toEqual('Payment was cancelled');
-				done();
-			});
+			const res = await checkForOrphanedPayments(event);
+			expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
+			expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
+			expect(res).toEqual('Payment was cancelled');
 
 		});
 
@@ -87,21 +81,17 @@ describe('checkForOrphanedPayments', () => {
 			sinon.stub(PaymentsService.prototype, 'createPaymentRecord').resolves({ createdDoc: 'yes' });
 		});
 
-		it('should call the correct services and exit with success', (done) => {
+		it('should call the correct services and exit with success', async () => {
+			const res = await checkForOrphanedPayments(event);
 
-			checkForOrphanedPayments(event, null, (err, res) => {
-				expect(err).toBe(null);
-				expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
-				expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
-				expect(DocumentsService.prototype.getDocument.getCall(0).args).toEqual(['group', 'id']);
-				expect(Utils.buildPaymentRecord.getCall(0).args).toEqual(['group', 'type', doc, {
-					authCode: 'auth_code',
-					receiptReference: 'ref',
-				}]);
-				expect(res).toEqual({ createdDoc: 'yes' });
-				done();
-			});
-
+			expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
+			expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
+			expect(DocumentsService.prototype.getDocument.getCall(0).args).toEqual(['group', 'id']);
+			expect(Utils.buildPaymentRecord.getCall(0).args).toEqual(['group', 'type', doc, {
+				authCode: 'auth_code',
+				receiptReference: 'ref',
+			}]);
+			expect(res).toEqual({ createdDoc: 'yes' });
 		});
 
 	});

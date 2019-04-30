@@ -5,3 +5,5 @@ build
 
 # Serverless directories
 .serverless
+
+.vscode
