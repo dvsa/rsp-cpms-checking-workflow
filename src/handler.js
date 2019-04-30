@@ -1,7 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import checkForOrphanedPayments from './functions/checkForOrphanedPayments';
 
-const handler = {
-	checkForOrphanedPayments,
-};
-
-export default handler;
+export { checkForOrphanedPayments };
