@@ -21,14 +21,12 @@ export default class SignedHttpClient {
 	get(path) {
 		const options = {
 			path: `${this.baseUrlOb.pathname}${path}`,
-			...(config.doSignedRequests ? this.signingOptions : {}),
+			...this.signingOptions,
 		};
-		if (config.doSignedRequests) {
-			aws4.sign(options, {
-				accessKeyId: this.credentials.clientId,
-				secretAccessKey: this.credentials.clientSecret,
-			});
-		}
+		aws4.sign(options, {
+			accessKeyId: this.credentials.clientId,
+			secretAccessKey: this.credentials.clientSecret,
+		});
 		return axios.get(`${this.baseUrlOb.href}${path}`, options);
 	}
 
@@ -39,14 +37,12 @@ export default class SignedHttpClient {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			...(config.doSignedRequests ? this.signingOptions : {}),
+			...this.signingOptions,
 		};
-		if (config.doSignedRequests) {
-			aws4.sign(options, {
-				accessKeyId: this.credentials.clientId,
-				secretAccessKey: this.credentials.clientSecret,
-			});
-		}
+		aws4.sign(options, {
+			accessKeyId: this.credentials.clientId,
+			secretAccessKey: this.credentials.clientSecret,
+		});
 		return axios.post(`${this.baseUrlOb.href}${path}`, data, options);
 	}
 }
