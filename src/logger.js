@@ -8,18 +8,18 @@ export const StatusCode = {
 	CpmsCodeReceived: 'CpmsCodeReceived',
 };
 
-export function logInfo(statusCode, message) {
+export function logInfo(logName, message) {
 	console.log({
-		logLevel: 'INFO',
-		statusCode,
+		logName,
 		message,
+		logLevel: 'INFO',
 	});
 }
 
-export function logError(statusCode, message) {
+export function logError(logName, message) {
 	console.error({
-		logLevel: 'ERROR',
-		statusCode,
+		logName,
 		message,
+		logLevel: 'ERROR',
 	});
 }

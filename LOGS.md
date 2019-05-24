@@ -6,7 +6,7 @@ All logs are in the following format:
 
 | Name        | Description |
 | ----------- | ----------- |
-| `statusCode`  | The status code is a string that uniquely identifies an status condition. See [List of Status Codes](#status-codes). |
+| `logName`  | The log name is a string that uniquely identifies an status condition. See [List of Log Names](#log-names). |
 | `message`     | A human readable description of the status. |
 | `logLevel`    | `INFO` or `ERROR` |
 
@@ -14,15 +14,15 @@ All logs are in the following format:
 
 ```
 {
-  "statusCode": "CpmsCodeReceived",
+  "logName": "CpmsCodeReceived",
   "message": "Received CPMS status code 807 for penalty reference 1613512512_FPN and receipt reference ECMS-3515234132-1351235",
   "logLevel": "INFO"
 }
 ```
 
-## Status Codes
+## Log Names
 
-| Status Code           | Description   |
+| Log Name              | Description   |
 | --------------------- | ------------- |
 | `PaymentAlreadyExists`  | Payment recorded in RSP. Removed message from SQS queue with no futher changes. |
 | `CpmsCodeReceived`      | Received status code from CPMS for the given receipt reference. |
