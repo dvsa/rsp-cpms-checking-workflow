@@ -59,7 +59,7 @@
     "wait-on": "^2.0.2"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.4.0",
+    "@babel/polyfill": "^7.12.1",
     "aws-sdk": "^2.427.0",
     "aws4": "^1.8.0",
     "axios": "^0.18.0",
