@@ -5,6 +5,9 @@
   "repository": "<replace>",
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": "16.16"
+  },
   "scripts": {
     "start": "rm -rf build && npm run copy-localfiles && npm run parallel",
     "presetup": "npm run copy-localfiles",
@@ -34,37 +37,36 @@
     "build-and-deploy-AWS": "npm run start-build && npm run deploy-AWS"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.4.0",
-    "@babel/preset-env": "^7.4.2",
-    "@babel/register": "^7.4.0",
-    "copyfiles": "^1.2.0",
-    "eslint": "^4.9.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
-    "expect": "^24.5.0",
-    "mocha": "^4.0.1",
-    "nodemon": "^1.12.1",
-    "npm-run-all": "^4.1.1",
-    "replace": "^1.1.0",
-    "rimraf": "^2.6.2",
-    "serverless": "^1.41.1",
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.19.1",
+    "@babel/preset-env": "^7.19.1",
+    "@babel/register": "^7.18.9",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.23.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "expect": "^29.0.3",
+    "mocha": "^10.0.0",
+    "nodemon": "^2.0.20",
+    "npm-run-all": "^4.1.5",
+    "replace": "^1.2.1",
+    "rimraf": "^3.0.2",
+    "serverless": "^3.22.0",
     "serverless-dynamodb-local": "^1.0.2",
-    "serverless-offline": "^4.9.2",
+    "serverless-offline": "^10.0.2",
     "serverless-openapi-documentation": "^0.4.0",
-    "serverless-pseudo-parameters": "^2.1.0",
-    "serverless-step-functions": "^1.15.0",
-    "sinon": "^4.0.2",
-    "supertest": "^3.0.0",
-    "wait-on": "^2.0.2"
+    "serverless-step-functions": "^3.9.0",
+    "sinon": "^14.0.0",
+    "supertest": "^6.2.4",
+    "wait-on": "^6.0.1"
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.0",
-    "aws-sdk": "^2.427.0",
-    "aws4": "^1.8.0",
-    "axios": "^0.18.0",
-    "lodash": "^4.17.11",
-    "moment": "^2.22.2",
-    "url-parse": "^1.4.3"
+    "aws-sdk": "^2.1217.0",
+    "aws4": "^1.11.0",
+    "axios": "^0.27.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "url-parse": "^1.5.10"
   }
 }

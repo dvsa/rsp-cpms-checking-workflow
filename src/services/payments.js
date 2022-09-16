@@ -7,6 +7,7 @@ export default class PaymentsService {
 	constructor() {
 		this.paymentHttpClient = new SignedHttpClient(appConfig.paymentServiceUrl);
 	}
+
 	async getPaymentRecord(IsGroupPayment, PenaltyId, PenaltyType) {
 		// Check if payment was recorded in the appropriate payments table;
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
@@ -28,6 +29,7 @@ export default class PaymentsService {
 			throw err;
 		}
 	}
+
 	async createPaymentRecord(IsGroupPayment, body) {
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
 		try {

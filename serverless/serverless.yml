@@ -2,7 +2,7 @@ service: rsp-cpms-checking
 
 provider:
   name: aws
-  runtime: nodejs10.18.0
+  runtime: nodejs16.x
   stage: dev
   region: eu-west-1
   iamRoleStatements:
@@ -29,7 +29,6 @@ functions:
 
 plugins:
   - serverless-step-functions
-  - serverless-pseudo-parameters
   - serverless-offline
 
 resources:

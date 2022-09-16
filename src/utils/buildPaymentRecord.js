@@ -1,4 +1,4 @@
-import parsePenaltyGroup from '../utils/parsePenaltyGroup';
+import parsePenaltyGroup from './parsePenaltyGroup';
 
 export default (IsGroupPayment, PenaltyType, document, paymentDetails) => {
 	const isImmobilisation = PenaltyType === 'IM';
@@ -35,7 +35,7 @@ export default (IsGroupPayment, PenaltyType, document, paymentDetails) => {
 
 function buildGroupPaymentPayload(paymentCode, receiptReference, type, penaltyGroup, authCode) {
 	const amountForType = penaltyGroup.penaltyGroupDetails.splitAmounts
-		.find(a => a.type === type).amount;
+		.find((a) => a.type === type).amount;
 	return {
 		PaymentCode: paymentCode,
 		PenaltyType: type,
@@ -47,7 +47,7 @@ function buildGroupPaymentPayload(paymentCode, receiptReference, type, penaltyGr
 			PaymentDate: Math.floor(Date.now() / 1000),
 		},
 		PenaltyIds: penaltyGroup.penaltyDetails
-			.find(penaltiesOfType => penaltiesOfType.type === type).penalties
-			.map(penalties => `${penalties.reference}_${type}`),
+			.find((penaltiesOfType) => penaltiesOfType.type === type).penalties
+			.map((penalties) => `${penalties.reference}_${type}`),
 	};
 }
