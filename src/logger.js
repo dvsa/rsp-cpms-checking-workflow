@@ -17,6 +17,14 @@ export function logInfo(logName, message) {
 	});
 }
 
+export function logDebug(logName, message) {
+	console.log({
+		logName,
+		message,
+		logLevel: 'DEBUG',
+	});
+}
+
 export function logError(logName, message) {
 	console.error({
 		logName,

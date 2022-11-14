@@ -1,7 +1,7 @@
 import SignedHttpClient from '../utils/httpClient';
 import appConfig from '../config';
 import isEmptyObject from '../utils/isEmptyObject';
-import { logError, StatusCode } from '../logger';
+import { logError, logDebug, StatusCode } from '../logger';
 
 export default class PaymentsService {
 	constructor() {
@@ -12,6 +12,7 @@ export default class PaymentsService {
 		// Check if payment was recorded in the appropriate payments table;
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
 		try {
+			logDebug('getPaymentRecord', { url: this.paymentHttpClient.baseUrlOb.href, getPaymentPath });
 			const response = await this.paymentHttpClient.get(`${getPaymentPath}/${PenaltyId}`);
 			const item = response.data;
 			const itemNotFound = typeof item === 'undefined' || isEmptyObject(item);
@@ -26,7 +27,6 @@ export default class PaymentsService {
 		} catch (err) {
 			if (err.message === 'Item not found') throw err;
 			if (typeof err.response !== 'undefined' && err.response.status === 404) throw new Error('Item not found');
-			logError('getPaymentRecord', { err });
 			throw err;
 		}
 	}

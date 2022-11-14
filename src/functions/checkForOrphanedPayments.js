@@ -33,11 +33,9 @@ export const handler = async (event) => {
 		if (notFoundErrors.includes(getPaymentRecordError.message)) {
 			return handlePenNotExist(message);
 		}
-		logError(
-			StatusCode.PaymentServiceError,
-			`Invalid response returned from payments service: ${getPaymentRecordError.message}`,
-		);
-		throw getPaymentRecordError;
+		const msg = `Invalid response returned from payments service: ${getPaymentRecordError.message}`;
+		logError(StatusCode.PaymentServiceError, msg);
+		throw new Error(`An unknown error occurred: ${msg}`);
 	}
 };
 
