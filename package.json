@@ -2,7 +2,7 @@
   "name": "rsp-cpms-checking",
   "version": "1.0.0",
   "description": "Service to check the status of orphaned payments in CPMS",
-  "repository": "<replace>",
+  "repository": "https://github.com/dvsa/rsp-cpms-checking-workflow",
   "author": "",
   "license": "MIT",
   "engines": {

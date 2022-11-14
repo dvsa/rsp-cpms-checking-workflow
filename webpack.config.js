@@ -20,7 +20,6 @@ module.exports = {
 		__filename: false,
 	},
 	mode: 'development',
-	devtool: 'source-map',
 	externals: [{ fsevents: "require('fsevents')" }],
 	module: {
 		rules: [

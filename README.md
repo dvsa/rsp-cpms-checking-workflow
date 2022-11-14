@@ -4,6 +4,7 @@ Polling workflow of CPMS receipts
 Triggered from SQS Launched Payments queue
 
 ## Run locally
+- `nvm use`
 - `npm i`
 - `npm run start`
 

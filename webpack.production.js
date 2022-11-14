@@ -57,8 +57,6 @@ class BundlePlugin {
 module.exports = () => {
 	return merge(common, {
 		mode: 'production',
-		// devtool: 'none',
-		devtool: 'source-map',
 		plugins: [
 			// @ts-ignore
 			new BundlePlugin({
