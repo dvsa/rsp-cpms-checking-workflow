@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 export const StatusCode = {
 	PaymentAlreadyExists: 'PaymentAlreadyExists',
 	CancelledPayment: 'CancelledPayment',

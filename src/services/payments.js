@@ -26,6 +26,7 @@ export default class PaymentsService {
 		} catch (err) {
 			if (err.message === 'Item not found') throw err;
 			if (typeof err.response !== 'undefined' && err.response.status === 404) throw new Error('Item not found');
+			logError('getPaymentRecord', { err });
 			throw err;
 		}
 	}

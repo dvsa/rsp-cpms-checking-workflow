@@ -21,14 +21,13 @@ custom:
 
 functions:
   checkForOrphanedPayments:
-    handler: handler.checkForOrphanedPayments
+    handler: app.handler
     events:
       - sqs:
           arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
           batchSize: 1
 
 plugins:
-  - serverless-step-functions
   - serverless-offline
 
 resources:
