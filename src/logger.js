@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 export const StatusCode = {
 	PaymentAlreadyExists: 'PaymentAlreadyExists',
 	CancelledPayment: 'CancelledPayment',
@@ -13,6 +14,14 @@ export function logInfo(logName, message) {
 		logName,
 		message,
 		logLevel: 'INFO',
+	});
+}
+
+export function logDebug(logName, message) {
+	console.log({
+		logName,
+		message,
+		logLevel: 'DEBUG',
 	});
 }
 

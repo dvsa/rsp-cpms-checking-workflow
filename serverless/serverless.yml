@@ -2,7 +2,7 @@ service: rsp-cpms-checking
 
 provider:
   name: aws
-  runtime: nodejs10.18.0
+  runtime: nodejs16.x
   stage: dev
   region: eu-west-1
   iamRoleStatements:
@@ -13,6 +13,14 @@ provider:
         - "sqs:DeleteMessage"
         - "sqs:GetQueueAttributes"
       Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
+  environment:
+    PAYMENT_SERVICE_URL: "http://host.docker.internal:3031"
+    process.env.SQS_URL: "aws.sqs.host"
+    CLIENT_ID: 'id'
+    CLIENT_SECRET: 'secret'
+    CPMS_SERVICE_URL: "http://host.docker.internal:4441"
+    DOCUMENT_SERVICE_URL: "http://host.docker.internal:3030"
+
 
 custom:
   initialWait: 180
@@ -21,15 +29,13 @@ custom:
 
 functions:
   checkForOrphanedPayments:
-    handler: handler.checkForOrphanedPayments
+    handler: app.handler
     events:
       - sqs:
           arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
           batchSize: 1
 
 plugins:
-  - serverless-step-functions
-  - serverless-pseudo-parameters
   - serverless-offline
 
 resources:

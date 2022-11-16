@@ -1,16 +1,18 @@
 import SignedHttpClient from '../utils/httpClient';
 import appConfig from '../config';
 import isEmptyObject from '../utils/isEmptyObject';
-import { logError, StatusCode } from '../logger';
+import { logError, logDebug, StatusCode } from '../logger';
 
 export default class PaymentsService {
 	constructor() {
 		this.paymentHttpClient = new SignedHttpClient(appConfig.paymentServiceUrl);
 	}
+
 	async getPaymentRecord(IsGroupPayment, PenaltyId, PenaltyType) {
 		// Check if payment was recorded in the appropriate payments table;
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
 		try {
+			logDebug('getPaymentRecord', { url: this.paymentHttpClient.baseUrlOb.href, getPaymentPath });
 			const response = await this.paymentHttpClient.get(`${getPaymentPath}/${PenaltyId}`);
 			const item = response.data;
 			const itemNotFound = typeof item === 'undefined' || isEmptyObject(item);
@@ -28,6 +30,7 @@ export default class PaymentsService {
 			throw err;
 		}
 	}
+
 	async createPaymentRecord(IsGroupPayment, body) {
 		const getPaymentPath = IsGroupPayment ? 'groupPayments' : 'payments';
 		try {

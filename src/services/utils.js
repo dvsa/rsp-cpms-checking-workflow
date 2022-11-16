@@ -17,6 +17,7 @@ export default class Utils {
 			IsGroupPayment: IsGroupPayment.stringValue === 'true',
 		};
 	}
+
 	static buildPaymentRecord(IsGroupPayment, PenaltyType, document, paymentDetails) {
 		const isImmobilisation = PenaltyType === 'IM';
 		const { ID } = document;
@@ -49,9 +50,10 @@ export default class Utils {
 			},
 		};
 	}
+
 	static buildGroupPaymentPayload(paymentCode, receiptReference, type, penaltyGroup, authCode) {
 		const amountForType = penaltyGroup.penaltyGroupDetails.splitAmounts
-			.find(a => a.type === type).amount;
+			.find((a) => a.type === type).amount;
 		return {
 			PaymentCode: paymentCode,
 			PenaltyType: type,
@@ -63,8 +65,8 @@ export default class Utils {
 				PaymentDate: Math.floor(Date.now() / 1000),
 			},
 			PenaltyIds: penaltyGroup.penaltyDetails
-				.find(penaltiesOfType => penaltiesOfType.type === type).penalties
-				.map(penalties => `${penalties.reference}_${type}`),
+				.find((penaltiesOfType) => penaltiesOfType.type === type).penalties
+				.map((penalties) => `${penalties.reference}_${type}`),
 		};
 	}
 }

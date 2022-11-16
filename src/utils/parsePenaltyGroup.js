@@ -1,4 +1,6 @@
-import { isEmpty, has, uniq, find } from 'lodash';
+import {
+	isEmpty, has, uniq, find,
+} from 'lodash';
 import { unix } from 'moment';
 
 export default (penaltyGroup) => {
@@ -40,15 +42,15 @@ function parsePayments(paymentsArr) {
 			status: payment.PaymentStatus,
 		};
 	});
-	const types = uniq(paymentsArr.map(payment => payment.PaymentCategory));
+	const types = uniq(paymentsArr.map((payment) => payment.PaymentCategory));
 	const parsedPenalties = types.map((type) => {
-		const penalties = paymentsArr.filter(p => p.PaymentCategory === type)[0].Penalties;
+		const penalties = paymentsArr.filter((p) => p.PaymentCategory === type)[0].Penalties;
 		return {
 			type,
-			penalties: penalties.map(p => parsePenalty(p)),
+			penalties: penalties.map((p) => parsePenalty(p)),
 		};
 	});
-	const unpaidPayments = paymentsArr.filter(payment => payment.PaymentStatus === 'UNPAID');
+	const unpaidPayments = paymentsArr.filter((payment) => payment.PaymentStatus === 'UNPAID');
 	const nextPayment = getNextPayment(unpaidPayments);
 	return { splitAmounts, parsedPenalties, nextPayment };
 }
@@ -96,4 +98,3 @@ function getPenaltyTypeDescription(penaltyType) {
 		return 'Unknown';
 	}
 }
-

@@ -2,8 +2,15 @@
 node_modules
 jspm_packages
 build
+dist
+
+# Mac files
+.DS_Store
 
 # Serverless directories
 .serverless
+
+# Logs
+events/log-out.json
 
 .vscode

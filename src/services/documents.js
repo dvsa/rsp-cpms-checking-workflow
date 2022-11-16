@@ -6,6 +6,7 @@ export default class DocumentsService {
 	constructor() {
 		this.documentsHttpClient = new SignedHttpClient(appConfig.documentServiceUrl);
 	}
+
 	async getDocument(IsGroupPayment, PenaltyId) {
 		const endpoint = IsGroupPayment ? 'penaltyGroup' : 'documents';
 		try {

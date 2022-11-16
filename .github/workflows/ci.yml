@@ -38,7 +38,7 @@ jobs:
     uses: dvsa/.github/.github/workflows/nodejs-build.yaml@v2
     needs: [ build-names ]
     with:
-      upload_artifact: ${{ github.ref_name == 'main' }}
+      upload_artifact: true
       build_folder: dist
       build_command: build:prod
 

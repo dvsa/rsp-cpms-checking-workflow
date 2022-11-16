@@ -1,4 +1,4 @@
 /* eslint-disable import/prefer-default-export */
-import checkForOrphanedPayments from './functions/checkForOrphanedPayments';
+import { handler } from './functions/checkForOrphanedPayments';
 
-export { checkForOrphanedPayments };
+export { handler };

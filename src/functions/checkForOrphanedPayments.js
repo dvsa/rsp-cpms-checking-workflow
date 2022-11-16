@@ -2,13 +2,13 @@ import PaymentsService from '../services/payments';
 import CpmsService from '../services/cpms';
 import DocumentsService from '../services/documents';
 import Utils from '../services/utils';
-import { StatusCode, logInfo } from '../logger';
+import { StatusCode, logInfo, logError } from '../logger';
 
 const paymentsService = new PaymentsService();
 const cpmsService = new CpmsService();
 const documentsService = new DocumentsService();
 
-export default async (event) => {
+export const handler = async (event) => {
 	// Lambda SQS integration must have a batchSize of 1
 	const { messageAttributes } = event.Records[0];
 	const message = Utils.parseMessageAttributes(messageAttributes);
@@ -33,11 +33,9 @@ export default async (event) => {
 		if (notFoundErrors.includes(getPaymentRecordError.message)) {
 			return handlePenNotExist(message);
 		}
-		logInfo(
-			StatusCode.PaymentServiceError,
-			`Invalid response returned from payments service: ${getPaymentRecordError.message}`,
-		);
-		throw getPaymentRecordError;
+		const msg = `Invalid response returned from payments service: ${getPaymentRecordError.message}`;
+		logError(StatusCode.PaymentServiceError, msg);
+		throw new Error(`An unknown error occurred: ${msg}`);
 	}
 };
 
@@ -85,3 +83,5 @@ async function handlePaymentConfirmed(message, authCode) {
 	// Succeed when payment record has been created
 	return createPaymentRecordResponse;
 }
+
+export default handler;
