@@ -2,7 +2,10 @@ import PaymentsService from '../services/payments';
 import CpmsService from '../services/cpms';
 import DocumentsService from '../services/documents';
 import Utils from '../services/utils';
-import { StatusCode, logInfo, logError } from '../logger';
+import {
+	StatusCode, logInfo, logError,
+} from '../logger';
+import errorMessageFromAxiosError from '../utils/handleError';
 
 const paymentsService = new PaymentsService();
 const cpmsService = new CpmsService();
@@ -33,34 +36,47 @@ export const handler = async (event) => {
 		if (notFoundErrors.includes(getPaymentRecordError.message)) {
 			return handlePenNotExist(message);
 		}
-		const msg = `Invalid response returned from payments service: ${getPaymentRecordError.message}`;
+
+		const msg = `Invalid response returned from payments service: ${getPaymentRecordError.message}. ${errorMessageFromAxiosError(getPaymentRecordError)}`;
 		logError(StatusCode.PaymentServiceError, msg);
+
 		throw new Error(`An unknown error occurred: ${msg}`);
 	}
 };
 
 async function handlePenNotExist(message) {
-	const { code, auth_code } = await cpmsService.confirm(message.PenaltyType, message.ReceiptReference); // eslint-disable-line
+	try {
+		const { code, auth_code } = await cpmsService.confirm(message.PenaltyType, message.ReceiptReference); // eslint-disable-line
 
-	logInfo(
-		StatusCode.CpmsCodeReceived,
-		`Received CPMS status code ${code} for penalty reference ${message.PenaltyId} and receipt reference ${message.ReceiptReference}`,
-	);
+		logInfo(
+			StatusCode.CpmsCodeReceived,
+			`Received CPMS status code ${code} for penalty reference ${message.PenaltyId} and receipt reference ${message.ReceiptReference}`,
+		);
 
-	// If the payment was cancelled, exit and delete the message from the queue
-	if (code === 807) {
-		const cancelMessage = `Payment cancelled with receipt reference ${message.ReceiptReference}. Removing from SQS queue.`;
-		logInfo(StatusCode.CancelledPayment, cancelMessage);
-		return cancelMessage;
+		// If the payment was cancelled, exit and delete the message from the queue
+		if (code === 807) {
+			const cancelMessage = `Payment cancelled with receipt reference ${message.ReceiptReference}. Removing from SQS queue.`;
+			logInfo(StatusCode.CancelledPayment, cancelMessage);
+			return cancelMessage;
+		}
+		// If payment is confirmed by CPMS, create a record in the payments table
+		if (code === 801) {
+			return handlePaymentConfirmed(message, auth_code);
+		}
+
+		if (code === 830) {
+			logInfo(StatusCode.PaymentPending, `CPMS payment unsuccessful. CPMS code: ${code}. Payment is actively being taken on the 3rd party's payment page. Will return message to the queue for retry`);
+			throw new Error(`CPMS payment pending, code: ${code}. Will retry.`);
+		}
+
+		logInfo(StatusCode.PaymentPending, `CPMS payment unsuccessful. CPMS code: ${code}`);
+
+		throw new Error(`CPMS payment unsuccessful, code: ${code} `);
+	} catch (err) {
+		const errorMessage = errorMessageFromAxiosError(err);
+		logError('handlePenaltyNotExistError', { errorMessage });
+		throw new Error(`An unknown error occurred attempting to check payment with CPMS: ${errorMessage}`);
 	}
-	// If payment is confirmed by CPMS, create a record in the payments table
-	if (code === 801) {
-		return handlePaymentConfirmed(message, auth_code);
-	}
-
-	logInfo(StatusCode.PaymentPending, `CPMS payment unsuccessful. CPMS code: ${code}`);
-
-	throw new Error(`CPMS payment unsuccessful, code: ${code} `);
 }
 
 async function handlePaymentConfirmed(message, authCode) {

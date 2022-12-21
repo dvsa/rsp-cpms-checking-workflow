@@ -6,6 +6,7 @@ import PaymentsService from '../services/payments';
 import CpmsService from '../services/cpms';
 import Utils from '../services/utils';
 import DocumentsService from '../services/documents';
+import * as logger from '../logger';
 
 describe('checkForOrphanedPayments', () => {
 
@@ -18,6 +19,7 @@ describe('checkForOrphanedPayments', () => {
 		if (typeof Utils.buildPaymentRecord.restore === 'function') Utils.buildPaymentRecord.restore();
 		if (typeof DocumentsService.prototype.getDocument.restore === 'function') DocumentsService.prototype.getDocument.restore();
 		if (typeof CpmsService.prototype.confirm.restore === 'function') CpmsService.prototype.confirm.restore();
+		sinon.restore();
 	});
 
 	beforeEach(() => {
@@ -33,6 +35,9 @@ describe('checkForOrphanedPayments', () => {
 			IsGroupPayment: 'group',
 		});
 		sinon.stub(Utils, 'buildPaymentRecord');
+		sinon.stub(console, 'log');
+		sinon.stub(console, 'debug');
+		sinon.stub(console, 'error');
 	});
 
 	describe('when a payment record has already been created', () => {
@@ -65,6 +70,35 @@ describe('checkForOrphanedPayments', () => {
 			expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
 			expect(res).toEqual('Payment cancelled with receipt reference ref. Removing from SQS queue.');
 
+		});
+
+	});
+
+	describe('when a payment record has not been created and the payment request fails', () => {
+		const axiosError = {
+			message: 'Status 500 was returned',
+			isAxiosError: true,
+			response: {
+				data: {
+					message: 'An Internal Server Error',
+				},
+			},
+		};
+		let logError;
+		before(() => {
+			sinon.stub(PaymentsService.prototype, 'getPaymentRecord').throws(axiosError);
+			logError = sinon.stub(logger, 'logError');
+		});
+
+		after(() => {
+			logError.restore();
+		});
+
+		it('should exit with an error saying the payment was not found', async () => {
+			expect(async () => {
+				await checkForOrphanedPayments(event);
+			}).rejects.toThrow();
+			sinon.assert.calledWith(logError, 'PaymentServiceError', 'Invalid response returned from payments service: Status 500 was returned. An Internal Server Error');
 		});
 
 	});
