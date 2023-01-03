@@ -12,7 +12,7 @@
     "check-security": "git secrets --scan",
     "check-security-log": "git log -p | scanrepo",
     "prepush": "npm run lint && npm test && npm run check-security && npm run check-security-log",
-    "test": "./node_modules/.bin/mocha --require @babel/register src/**/*.unit.js",
+    "test": "./node_modules/.bin/mocha --require @babel/register test/**",
     "lint": "./node_modules/.bin/eslint src",
     "lint:fix": "./node_modules/.bin/eslint src --fix",
     "watch": "./node_modules/.bin/nodemon --watch src --exec npm run build",
@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.0",
+    "@dvsa/secrets-manager": "^1.1.0",
     "aws-sdk": "^2.1253.0",
     "aws4": "^1.11.0",
     "axios": "^1.1.3",

@@ -1,7 +1,7 @@
 import expect from 'expect';
 import sinon from 'sinon';
 
-import PaymentsService from './payments';
+import PaymentsService from '../../src/services/payments';
 
 describe('payments service', () => {
 

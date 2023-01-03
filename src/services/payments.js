@@ -5,7 +5,7 @@ import { logError, StatusCode } from '../logger';
 
 export default class PaymentsService {
 	constructor() {
-		this.paymentHttpClient = new SignedHttpClient(appConfig.paymentServiceUrl);
+		this.paymentHttpClient = new SignedHttpClient(appConfig.paymentServiceUrl());
 	}
 
 	async getPaymentRecord(IsGroupPayment, PenaltyId, PenaltyType) {

@@ -5,13 +5,24 @@ import Utils from '../services/utils';
 import {
 	StatusCode, logInfo, logError,
 } from '../logger';
-import errorMessageFromAxiosError from '../utils/handleError';
+import config from '../config';
+import handleError from '../utils/handleError';
 
-const paymentsService = new PaymentsService();
-const cpmsService = new CpmsService();
-const documentsService = new DocumentsService();
+let paymentsService;
+let cpmsService;
+let documentsService;
 
 export const handler = async (event) => {
+	try {
+		await config.configInit();
+		paymentsService = new PaymentsService();
+		cpmsService = new CpmsService();
+		documentsService = new DocumentsService();
+	} catch (err) {
+		const msg = `Error: ${err.message}. ${handleError.errorMessageFromAxiosError(err)}`;
+		logError('SecretsManagerError', msg);
+		throw new Error(`An error occurred: ${msg}`);
+	}
 	// Lambda SQS integration must have a batchSize of 1
 	const { messageAttributes } = event.Records[0];
 	const message = Utils.parseMessageAttributes(messageAttributes);
@@ -37,7 +48,7 @@ export const handler = async (event) => {
 			return handlePenNotExist(message);
 		}
 
-		const msg = `Invalid response returned from payments service: ${getPaymentRecordError.message}. ${errorMessageFromAxiosError(getPaymentRecordError)}`;
+		const msg = `Error: ${getPaymentRecordError.message}. ${handleError.errorMessageFromAxiosError(getPaymentRecordError)}`;
 		logError(StatusCode.PaymentServiceError, msg);
 
 		throw new Error(`An unknown error occurred: ${msg}`);
@@ -73,7 +84,7 @@ async function handlePenNotExist(message) {
 
 		throw new Error(`CPMS payment unsuccessful, code: ${code} `);
 	} catch (err) {
-		const errorMessage = errorMessageFromAxiosError(err);
+		const errorMessage = handleError.errorMessage(err);
 		logError('handlePenaltyNotExistError', { errorMessage });
 		throw new Error(`An unknown error occurred attempting to check payment with CPMS: ${errorMessage}`);
 	}

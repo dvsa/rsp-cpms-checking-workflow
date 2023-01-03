@@ -1,16 +1,17 @@
 import expect from 'expect';
 import sinon from 'sinon';
 
-import checkForOrphanedPayments from './checkForOrphanedPayments';
-import PaymentsService from '../services/payments';
-import CpmsService from '../services/cpms';
-import Utils from '../services/utils';
-import DocumentsService from '../services/documents';
-import * as logger from '../logger';
+import checkForOrphanedPayments from '../../src/functions/checkForOrphanedPayments';
+import PaymentsService from '../../src/services/payments';
+import CpmsService from '../../src/services/cpms';
+import Utils from '../../src/services/utils';
+import DocumentsService from '../../src/services/documents';
+import config from '../../src/config';
 
 describe('checkForOrphanedPayments', () => {
 
 	let event;
+	let configStub;
 
 	afterEach(() => {
 		if (typeof PaymentsService.prototype.getPaymentRecord.restore === 'function') PaymentsService.prototype.getPaymentRecord.restore();
@@ -38,11 +39,13 @@ describe('checkForOrphanedPayments', () => {
 		sinon.stub(console, 'log');
 		sinon.stub(console, 'debug');
 		sinon.stub(console, 'error');
+		configStub = sinon.stub(config, 'configInit');
 	});
 
 	describe('when a payment record has already been created', () => {
 		let getPaymentRecordStub;
-		before(() => {
+		beforeEach(() => {
+			configStub.resolves({});
 			getPaymentRecordStub = sinon.stub(PaymentsService.prototype, 'getPaymentRecord').resolves({ payment: 'payment' });
 		});
 
@@ -55,7 +58,8 @@ describe('checkForOrphanedPayments', () => {
 	});
 
 	describe('when a payment record has not been created and the payment was cancelled', () => {
-		before(() => {
+		beforeEach(() => {
+			configStub.resolves({});
 			sinon.stub(PaymentsService.prototype, 'getPaymentRecord').throws(new Error('Item not found'));
 			sinon.stub(CpmsService.prototype, 'confirm').resolves({
 				code: 807,
@@ -84,28 +88,23 @@ describe('checkForOrphanedPayments', () => {
 				},
 			},
 		};
-		let logError;
-		before(() => {
+		beforeEach(() => {
+			configStub.resolves({});
 			sinon.stub(PaymentsService.prototype, 'getPaymentRecord').throws(axiosError);
-			logError = sinon.stub(logger, 'logError');
-		});
-
-		after(() => {
-			logError.restore();
 		});
 
 		it('should exit with an error saying the payment was not found', async () => {
-			expect(async () => {
+			await expect(async () => {
 				await checkForOrphanedPayments(event);
-			}).rejects.toThrow();
-			sinon.assert.calledWith(logError, 'PaymentServiceError', 'Invalid response returned from payments service: Status 500 was returned. An Internal Server Error');
+			}).rejects.toThrow('An unknown error occurred: Error: Status 500 was returned. An Internal Server Error');
 		});
 
 	});
 
 	describe('when a payment record has not been created and the payment was successful', () => {
 		const doc = { doc: 'doc' };
-		before(() => {
+		beforeEach(() => {
+			configStub.resolves({});
 			sinon.stub(PaymentsService.prototype, 'getPaymentRecord').throws(new Error('Item not found'));
 			sinon.stub(CpmsService.prototype, 'confirm').resolves({
 				code: 801,
@@ -130,4 +129,16 @@ describe('checkForOrphanedPayments', () => {
 
 	});
 
+	describe('when secret manager fails', () => {
+		beforeEach(() => {
+			configStub.rejects({
+				message: 'An error occurred getting secrets from secret manager: The security token included in the request is invalid.',
+			});
+		});
+		it('should throw an error', async () => {
+			await expect(async () => {
+				await checkForOrphanedPayments(event);
+			}).rejects.toThrow('An error occurred: Error: An error occurred getting secrets from secret manager: The security token included in the request is invalid.');
+		});
+	});
 });

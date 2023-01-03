@@ -3,7 +3,7 @@ import appConfig from '../config';
 
 export default class CpmsService {
 	constructor() {
-		this.cpmsHttpClient = new SignedHttpClient(appConfig.cpmsServiceUrl);
+		this.cpmsHttpClient = new SignedHttpClient(appConfig.cpmsServiceUrl());
 	}
 
 	async confirm(penaltyType, receiptReference) {
