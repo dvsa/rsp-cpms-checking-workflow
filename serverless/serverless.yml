@@ -14,10 +14,10 @@ provider:
         - "sqs:GetQueueAttributes"
       Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
   environment:
-    PAYMENT_SERVICE_URL: "http://host.docker.internal:3031"
-    process.env.SQS_URL: "aws.sqs.host"
     CLIENT_ID: 'id'
     CLIENT_SECRET: 'secret'
+    REGION: 'region'
+    PAYMENT_SERVICE_URL: "http://host.docker.internal:3031"
     CPMS_SERVICE_URL: "http://host.docker.internal:4441"
     DOCUMENT_SERVICE_URL: "http://host.docker.internal:3030"
 

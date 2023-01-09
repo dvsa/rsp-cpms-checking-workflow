@@ -4,7 +4,7 @@ import { StatusCode, logError } from '../logger';
 
 export default class DocumentsService {
 	constructor() {
-		this.documentsHttpClient = new SignedHttpClient(appConfig.documentServiceUrl);
+		this.documentsHttpClient = new SignedHttpClient(appConfig.documentServiceUrl());
 	}
 
 	async getDocument(IsGroupPayment, PenaltyId) {

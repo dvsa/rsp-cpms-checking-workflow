@@ -4,6 +4,8 @@ Polling workflow of CPMS receipts
 Triggered from SQS Launched Payments queue
 
 ## Run locally
+
+Ensure you have AWS credentials for secrets manager or set secrets in `config.js`
 - `nvm use`
 - `npm i`
 - `npm run start`

@@ -18,11 +18,11 @@
                 "ApproximateFirstReceiveTimestamp": "1545082649185"
             },
             "messageAttributes": {
-                "PenaltyId": "1234567F89_FPN",
-			    "ReceiptReference":"receiptReference",
-			    "RegistrationNumber": "registrationNumber",
-			    "PenaltyType": "FPN",
-			    "IsGroupPayment": "false"
+                "PenaltyId": { "stringValue" : "1234567842846_FPN" },
+			    "ReceiptReference":{ "stringValue" : "receiptReference"},
+			    "RegistrationNumber":{ "stringValue" : "ANNA1"} ,
+			    "PenaltyType": { "stringValue" : "FPN"},
+			    "IsGroupPayment": { "stringValue" : "false"}
             },
             "md5OfBody": "e4e68fb7bd0e697a0ae8f1bb342846b3",
             "eventSource": "aws:sqs",

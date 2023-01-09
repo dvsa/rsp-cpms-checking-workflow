@@ -14,3 +14,5 @@ dist
 events/log-out.json
 
 .vscode
+
+.env
