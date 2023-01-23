@@ -9,11 +9,27 @@ env:
   KEY_PATH: cpms-checking/checkForOrphanedPayments
 
 jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: node
+          package-name: ${{ github.event.repository.name }}
 
   promote:
     runs-on: ubuntu-latest
+    if: ${{ needs.release-please.outputs.release_created }}
     permissions:
       id-token: write
+    needs: [ release-please ]
     steps:
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -27,5 +43,6 @@ jobs:
           --tagging-directive REPLACE
           --tagging promote=YES
           --copy-source ${{ secrets.RSP_NONPROD_S3_BUCKET_NAME }}/${{ env.COPY_SOURCE }}
-          --key ${{ env.KEY_PATH }}/release-${{ github.ref_name }}.zip
+          --key ${{ env.KEY_PATH }}/release-${{ needs.release-please.outputs.tag_name }}.zip
           --bucket ${{ secrets.RSP_NONPROD_S3_BUCKET_NAME }}
+
