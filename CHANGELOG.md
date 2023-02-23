@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v3.0.1...v3.0.2) (2023-02-22)
+
+
+### Bug Fixes
+
+* The S3 bucket path for the release webhook.  ([#56](https://github.com/dvsa/rsp-cpms-checking-workflow/issues/56)) ([ae82e33](https://github.com/dvsa/rsp-cpms-checking-workflow/commit/ae82e33716a00f3064be2dc4e63f7e524f7d682b))
+
 ## [3.0.1](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v3.0.0...v3.0.1) (2023-01-31)
 
 
