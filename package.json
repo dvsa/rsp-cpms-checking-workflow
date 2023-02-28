@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.0",
-    "@dvsa/secrets-manager": "^1.1.0",
+    "@dvsa/secrets-manager": "github:dvsa/dvsa-secrets-manager#feat/rsp-2228-security-fix",
     "aws-sdk": "^2.1253.0",
     "aws4": "^1.11.0",
     "axios": "^1.1.3",
