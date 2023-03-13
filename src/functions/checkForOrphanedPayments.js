@@ -70,6 +70,14 @@ async function handlePenNotExist(message) {
 			logInfo(StatusCode.CancelledPayment, cancelMessage);
 			return cancelMessage;
 		}
+
+		// If the payment failed, exit and delete the message from the queue
+		if (code === 810) {
+			const cancelMessage = `Payment with receipt reference ${message.ReceiptReference} failed. CPMS returned code ${code}. Removing from SQS queue.`;
+			logInfo(StatusCode.CpmsCodeReceived, cancelMessage);
+			return cancelMessage;
+		}
+
 		// If payment is confirmed by CPMS, create a record in the payments table
 		if (code === 801) {
 			return handlePaymentConfirmed(message, auth_code);
