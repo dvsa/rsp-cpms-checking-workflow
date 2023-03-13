@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.3](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v3.0.2...v3.0.3) (2023-03-13)
+
+
+### Bug Fixes
+
+* Add handling for Capita unrecoverable failures ([#60](https://github.com/dvsa/rsp-cpms-checking-workflow/issues/60)) ([586df3d](https://github.com/dvsa/rsp-cpms-checking-workflow/commit/586df3d551304a4c8280dbea2537f3e1f885690b))
+
 ## [3.0.2](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v3.0.1...v3.0.2) (2023-02-22)
 
 
