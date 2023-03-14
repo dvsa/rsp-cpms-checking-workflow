@@ -1,6 +1,6 @@
 {
   "name": "rsp-cpms-checking",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Service to check the status of orphaned payments in CPMS",
   "repository": "https://github.com/dvsa/rsp-cpms-checking-workflow",
   "author": "",

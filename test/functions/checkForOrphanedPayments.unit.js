@@ -78,6 +78,25 @@ describe('checkForOrphanedPayments', () => {
 
 	});
 
+	describe('when a payment record has not been created and the payment failed from capita with a final status code', () => {
+		beforeEach(() => {
+			configStub.resolves({});
+			sinon.stub(PaymentsService.prototype, 'getPaymentRecord').throws(new Error('Item not found'));
+			sinon.stub(CpmsService.prototype, 'confirm').resolves({
+				code: 810,
+				auth_code: 'auth_code',
+			});
+		});
+
+		it('should exit with success saying the payment had been cancelled', async () => {
+			const res = await checkForOrphanedPayments(event);
+			expect(Utils.parseMessageAttributes.getCall(0).args).toEqual([{}]);
+			expect(CpmsService.prototype.confirm.getCall(0).args).toEqual(['type', 'ref']);
+			expect(res).toEqual('Payment with receipt reference ref failed. CPMS returned code 810. Removing from SQS queue.');
+		});
+
+	});
+
 	describe('when a payment record has not been created and the payment request fails', () => {
 		const axiosError = {
 			message: 'Status 500 was returned',
