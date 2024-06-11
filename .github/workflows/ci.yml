@@ -45,9 +45,9 @@ jobs:
     needs: [ build-names ]
     with:
       node-version: 20.x
-      upload_artifact: true
-      build_folder: dist
-      build_command: npm run build:prod
+      upload-artifact: true
+      build-folder: dist
+      build-command: npm run build:prod
 
   upload-s3:
     if: startsWith( github.ref, 'refs/heads/feature/') || startsWith( github.ref, 'refs/heads/fix/') || ${{ github.ref_name == github.event.repository.default_branch }}
@@ -55,9 +55,9 @@ jobs:
     needs: [ lint, test, build, build-names ]
     with:
       environment: nonprod
-      short_commit: ${{ needs.build-names.outputs.short_sha }}
+      short-commit: ${{ needs.build-names.outputs.short_sha }}
       artifact: checkForOrphanedPayments.zip
-      bucket_key: cpms-checking/checkForOrphanedPayments/${{ needs.build-names.outputs.pretty_branch_name }}.zip
+      bucket-key: cpms-checking/checkForOrphanedPayments/${{ needs.build-names.outputs.pretty_branch_name }}.zip
     permissions:
       id-token: write
     secrets:
@@ -72,8 +72,8 @@ jobs:
     needs: [ build-names, build, upload-s3 ]
     with:
       environment: nonprod
-      lambda_function_name: rsp-nonprod-apis-cpms-checking-checkForOrphanedPayments
-      bucket_key: cpms-checking/checkForOrphanedPayments/${{ needs.build-names.outputs.pretty_branch_name }}.zip
+      lambda-function-name: rsp-nonprod-apis-cpms-checking-checkForOrphanedPayments
+      bucket-key: cpms-checking/checkForOrphanedPayments/${{ needs.build-names.outputs.pretty_branch_name }}.zip
     permissions:
       id-token: write
     secrets:

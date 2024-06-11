@@ -18,8 +18,8 @@ jobs:
     uses: dvsa/.github/.github/workflows/update-lambda-function.yaml@v4.0.1
     with:
       environment: ${{ github.event.inputs.environment }}
-      lambda_function_name: rsp-nonprod-apis-cpms-checking-checkForOrphanedPayments
-      bucket_key: cpms-checking/checkForOrphanedPayments/${{ github.event.inputs.zip_archive }}
+      lambda-function-name: rsp-nonprod-apis-cpms-checking-checkForOrphanedPayments
+      bucket-key: cpms-checking/checkForOrphanedPayments/${{ github.event.inputs.zip_archive }}
     permissions:
       id-token: write
     secrets:
