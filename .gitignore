@@ -16,3 +16,5 @@ events/log-out.json
 .vscode
 
 .env
+
+.idea
