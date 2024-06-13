@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v3.0.3...v4.0.0) (2024-06-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Node 20 Compat & Dep/CI Bumps ([#66](https://github.com/dvsa/rsp-cpms-checking-workflow/issues/66))
+
+### Features
+
+* Node 20 Compat & Dep/CI Bumps ([#66](https://github.com/dvsa/rsp-cpms-checking-workflow/issues/66)) ([e9371d9](https://github.com/dvsa/rsp-cpms-checking-workflow/commit/e9371d911215e60d3670ce7d1ba8a98a4e00482b))
+
 ## [3.0.3](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v3.0.2...v3.0.3) (2023-03-13)
 
 
