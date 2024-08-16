@@ -1,6 +1,6 @@
 # Changelog
 
-## [5.0.0](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v4.0.0...v5.0.0) (2024-08-16)
+## [4.0.0](https://github.com/dvsa/rsp-cpms-checking-workflow/compare/v4.0.0...v5.0.0) (2024-08-16)
 
 
 ### ⚠ BREAKING CHANGES
