@@ -1,4 +1,5 @@
-import { SecretsManager } from '@dvsa/secrets-manager';
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { logError, logInfo } from './logger';
 
 const configMetadata = {
 	clientId: 'CLIENT_ID',
@@ -9,23 +10,26 @@ const configMetadata = {
 	region: 'REGION',
 };
 
-const configuration = {};
+let configuration = {};
 
 const configInit = async () => {
-	let secrets;
-	try {
-		const secretManagerName = process.env.SECRETS_MANAGER_SECRET_NAME;
-		const secretManager = new SecretsManager();
-		secrets = await secretManager.getSecret(secretManagerName);
-	} catch (err) {
-		throw new Error(`An error occurred getting secrets from secret manager: ${err.message}`);
-	}
-	Object.values(configMetadata).forEach((secretName) => {
-		if (!secrets[secretName]) {
-			throw new Error(`Error getting secrets from Secret Manager. Missing '${secretName}' from secret manager`);
+	if (process.env.USE_SECRETS_MANAGER === 'true') {
+		const SecretId = process.env.SECRETS_MANAGER_SECRET_NAME;
+		logInfo('CheckingWorkflowSecretsManagerSecretId', { secretId: SecretId });
+		const secretsManagerClient = new SecretsManagerClient({ region: process.env.REGION });
+		try {
+			const response = await secretsManagerClient.send(new GetSecretValueCommand({ SecretId }));
+			configuration = JSON.parse(response.SecretString);
+		} catch (error) {
+			logError('CheckingWorkflowSecretsManagerError', error.message);
+			throw error;
 		}
-		configuration[secretName] = secrets[secretName];
-	});
+		return configuration;
+	}
+	logInfo('CheckingWorkflowServiceEnvVars', 'Using envvars for config');
+	configuration = Object.values(configMetadata)
+		.reduce((config, envkey) => ({ [envkey]: process.env[envkey], ...config }), configuration);
+	return configuration;
 };
 
 const fromConfiguration = (configKey) => () => {

@@ -1,84 +1,105 @@
 import expect from 'expect';
 import sinon from 'sinon';
-
 import PaymentsService from '../../src/services/payments';
+import appConfig from '../../src/config';
+import { StatusCode } from '../../src/logger';
 
-describe('payments service', () => {
-
-	let paymentsSvc;
-	let mockGet;
-	let mockPost;
-	const mockPaymentGetResponse = {
-		data: {
-			Payments: { type: 'payment' },
-		},
-	};
-	const mockPaymentRecord = {
-		type: 'type',
-		id: 'id',
-	};
-	const mockPaymentPostResponse = {
-		data: 'data',
-	};
+describe('PaymentsService', () => {
+	let paymentsService;
+	let getStub;
+	let postStub;
+	let errorLogStub;
 
 	beforeEach(() => {
-		paymentsSvc = new PaymentsService();
-		mockGet = sinon.stub(paymentsSvc.paymentHttpClient, 'get').resolves(mockPaymentGetResponse);
-		mockPost = sinon.stub(paymentsSvc.paymentHttpClient, 'post').resolves(mockPaymentPostResponse);
-	});
-	afterEach(() => {
-		mockGet.restore();
-		mockPost.restore();
+		sinon.stub(appConfig, 'paymentServiceUrl').returns('http://payments.dummy.invalid/api/');
+		paymentsService = new PaymentsService();
+		getStub = sinon.stub(paymentsService.paymentHttpClient, 'get');
+		postStub = sinon.stub(paymentsService.paymentHttpClient, 'post');
+		errorLogStub = sinon.stub(console, 'error');
 	});
 
-	describe('when getPaymentRecord is called for a group payment', () => {
+	afterEach(() => sinon.restore());
 
-		it('should should call the correct endpoint on the http client and respond correctly', (done) => {
-			paymentsSvc.getPaymentRecord(true, 'id', 'type')
-				.then((res) => {
-					expect(mockGet.getCall(0).args[0]).toEqual('groupPayments/id');
-					expect(res).toEqual('payment');
-					done();
-				});
+	it('gets an individual penalty payment record', async () => {
+		const record = { PaymentCode: 'DUMMY-TOKEN', PenaltyStatus: 'PAID' };
+		getStub.resolves({ data: record });
+
+		expect(await paymentsService.getPaymentRecord(false, 'DUMMY-PENALTY', 'FPN')).toEqual(record);
+		expect(getStub.getCall(0).args[0]).toEqual('payments/DUMMY-PENALTY');
+	});
+
+	it('gets the requested payment from a group record', async () => {
+		const record = { PaymentCode: 'DUMMY-TOKEN', PenaltyStatus: 'PAID' };
+		getStub.resolves({ data: { Payments: { FPN: record } } });
+
+		expect(await paymentsService.getPaymentRecord(true, 'DUMMY-GROUP', 'FPN')).toEqual(record);
+		expect(getStub.getCall(0).args[0]).toEqual('groupPayments/DUMMY-GROUP');
+	});
+
+	it('reports a missing payment when the response is undefined', async () => {
+		getStub.resolves({ data: undefined });
+
+		await expect(paymentsService.getPaymentRecord(false, 'DUMMY-PENALTY', 'FPN'))
+			.rejects.toThrow('Item not found');
+	});
+
+	it('reports a missing payment when the response is an empty object', async () => {
+		getStub.resolves({ data: {} });
+
+		await expect(paymentsService.getPaymentRecord(false, 'DUMMY-PENALTY', 'FPN'))
+			.rejects.toThrow('Item not found');
+	});
+
+	it('reports a missing category when a group exists without that payment type', async () => {
+		getStub.resolves({ data: { Payments: {} } });
+
+		await expect(paymentsService.getPaymentRecord(true, 'DUMMY-GROUP', 'FPN'))
+			.rejects.toThrow('Payment for type: FPN not found in item');
+	});
+
+	it('normalizes an HTTP 404 response to the missing-item error', async () => {
+		getStub.rejects({
+			message: 'Dummy not found response',
+			response: { status: 404 },
 		});
 
+		await expect(paymentsService.getPaymentRecord(false, 'DUMMY-PENALTY', 'FPN'))
+			.rejects.toThrow('Item not found');
 	});
 
-	describe('when getPaymentRecord is called for a single penalty payment', () => {
+	it('propagates non-404 retrieval errors unchanged', async () => {
+		const failure = new Error('Dummy payments service failure');
+		getStub.rejects(failure);
 
-		it('should should call the correct endpoint on the http client and respond correctly', (done) => {
-			paymentsSvc.getPaymentRecord(false, 'id', 'type')
-				.then((res) => {
-					expect(mockGet.getCall(0).args[0]).toEqual('payments/id');
-					expect(res).toEqual(mockPaymentGetResponse.data);
-					done();
-				});
+		await expect(paymentsService.getPaymentRecord(false, 'DUMMY-PENALTY', 'FPN'))
+			.rejects.toBe(failure);
+	});
+
+	it('creates individual payment records', async () => {
+		const record = { PaymentCode: 'DUMMY-TOKEN', PenaltyStatus: 'PAID' };
+		postStub.resolves({ data: { saved: true } });
+
+		expect(await paymentsService.createPaymentRecord(false, record)).toEqual({ saved: true });
+		expect(postStub.getCall(0).args).toEqual(['payments', record]);
+	});
+
+	it('creates group payment records', async () => {
+		const record = { PaymentCode: 'DUMMY-GROUP', PenaltyType: 'FPN' };
+		postStub.resolves({ data: { saved: true } });
+
+		expect(await paymentsService.createPaymentRecord(true, record)).toEqual({ saved: true });
+		expect(postStub.getCall(0).args).toEqual(['groupPayments', record]);
+	});
+
+	it('logs and rethrows payment creation errors', async () => {
+		const failure = new Error('Dummy create failure');
+		postStub.rejects(failure);
+
+		await expect(paymentsService.createPaymentRecord(false, {})).rejects.toBe(failure);
+		expect(errorLogStub.getCall(0).args[0]).toEqual({
+			logName: StatusCode.PaymentServiceError,
+			message: failure.message,
+			logLevel: 'ERROR',
 		});
-
 	});
-
-	describe('when createPaymentRecord is called for a single penalty payment', () => {
-		it('should should call the correct endpoint on the http client', (done) => {
-			paymentsSvc.createPaymentRecord(false, mockPaymentRecord)
-				.then((res) => {
-					expect(mockPost.getCall(0).args[0]).toEqual('payments');
-					expect(res).toEqual('data');
-					done();
-				});
-		});
-
-	});
-
-	describe('when createPaymentRecord is called for a group payment', () => {
-		it('should should call the correct endpoint on the http client', (done) => {
-			paymentsSvc.createPaymentRecord(true, mockPaymentRecord)
-				.then((res) => {
-					expect(mockPost.getCall(0).args[0]).toEqual('groupPayments');
-					expect(res).toEqual('data');
-					done();
-				});
-		});
-
-	});
-
 });

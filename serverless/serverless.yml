@@ -2,24 +2,26 @@ service: rsp-cpms-checking
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs24.x
   stage: dev
   region: eu-west-1
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - "sqs:SendMessage"
-        - "sqs:ReceiveMessage"
-        - "sqs:DeleteMessage"
-        - "sqs:GetQueueAttributes"
-      Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "sqs:SendMessage"
+            - "sqs:ReceiveMessage"
+            - "sqs:DeleteMessage"
+            - "sqs:GetQueueAttributes"
+          Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
   environment:
-    CLIENT_ID: 'id'
-    CLIENT_SECRET: 'secret'
-    REGION: 'region'
-    PAYMENT_SERVICE_URL: "http://host.docker.internal:3031"
-    CPMS_SERVICE_URL: "http://host.docker.internal:4441"
-    DOCUMENT_SERVICE_URL: "http://host.docker.internal:3030"
+    CLIENT_ID: ${env:CLIENT_ID, 'id'}
+    CLIENT_SECRET: ${env:CLIENT_SECRET, 'secret'}
+    REGION: ${env:REGION, 'region'}
+    PAYMENT_SERVICE_URL: ${env:PAYMENT_SERVICE_URL, 'http://host.docker.internal:3031'}
+    CPMS_SERVICE_URL: ${env:CPMS_SERVICE_URL, 'http://host.docker.internal:4441'}
+    DOCUMENT_SERVICE_URL: ${env:DOCUMENT_SERVICE_URL, 'http://host.docker.internal:3030'}
 
 
 custom:

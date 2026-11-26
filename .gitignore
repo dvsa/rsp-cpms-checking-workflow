@@ -3,6 +3,10 @@ node_modules
 jspm_packages
 build
 dist
+.webpack
+coverage
+.nyc_output
+integration-results
 
 # Mac files
 .DS_Store
