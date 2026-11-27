@@ -38,10 +38,5 @@ module.exports = {
 		],
 	},
 	plugins: [
-		new CopyWebpackPlugin({
-			patterns: [
-				{ from: 'serverless/serverless.yml', to: `${path.resolve(__dirname, 'build')}` },
-			],
-		}),
 	],
 };

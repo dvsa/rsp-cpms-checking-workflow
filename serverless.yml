@@ -1,0 +1,37 @@
+service: rsp-cpms-checking
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  timeout: 10
+  stage: dev
+  region: eu-west-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "sqs:SendMessage"
+            - "sqs:ReceiveMessage"
+            - "sqs:DeleteMessage"
+            - "sqs:GetQueueAttributes"
+          Resource: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
+
+
+custom:
+  initialWait: 180
+  maxAttempts: 4
+  retryWait: 300
+
+functions:
+  checkForOrphanedPayments:
+    handler: build/app.handler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:#{AWS::Region}:#{AWS::AccountId}:LaunchedPayments
+          batchSize: 1
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+

@@ -1,5 +1,5 @@
 export AWS_DEFAULT_REGION=eu-west-1
-export AWS_PROFILE=rspnonprodPA
+export AWS_PROFILE=
 
 aws lambda invoke --function-name rsp-cpms-checking-dev-checkForOrphanedPayments \
   --cli-binary-format raw-in-base64-out \
